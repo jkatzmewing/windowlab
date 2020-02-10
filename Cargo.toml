@@ -8,4 +8,5 @@ edition = "2018"
 
 [dependencies]
 getopts = "0.2"
+nix = "0.17"
 x11 = "2.18"
