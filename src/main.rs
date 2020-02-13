@@ -34,20 +34,17 @@ fn main() {
 
 fn scan_wins(conn: &xcb::Connection, root: xcb::Window) {
     if let reply = xcb::query_tree(conn, root).get_reply() {
-        let children = reply.children();
-        let n_children = reply.children_len();
-
-        for n in 0..n_children {
+        for w in reply.unwrap().children().iter() {
             if let attr_reply = xcb::get_window_attributes(
                 conn,
-                children[n],
+                *w,
             ).get_reply() {
                 let attr = attr_reply.unwrap();
-                if attr.override_redirect() == 0 &&
+                if !attr.override_redirect() &&
                     attr.map_state() == xcb::MAP_STATE_VIEWABLE
                         .try_into()
                         .unwrap() {
-                    reparent::make_new_client(children[n]);
+                    reparent::make_new_client(*w);
                 }
             }
         }
