@@ -25,7 +25,7 @@ fn main() {
     opts.optopt("", "empty", "set empty color", "COLOR");
     opts.optopt("", "display", "set X11 display", "DISPLAY");
 
-    let (conn, root) = setup_display();
+    let (conn, root) = setup_display(&opts);
     menufile::get_menuitems();
     taskbar::make_taskbar();
     scan_wins(&conn, root);
@@ -51,8 +51,7 @@ fn scan_wins(conn: &xcb::Connection, root: xcb::Window) {
     }
 }
 
-fn setup_display() -> (xcb::Connection, xcb::Window) {
-    use xcb::{intern_atom, alloc_named_color};
+fn setup_display(opts: &Options) -> (xcb::Connection, xcb::Window) {
     let (conn, screen_num) = xcb::Connection::connect(None)
         .expect("Could not connect to X server");
     let setup = conn.get_setup();
@@ -61,6 +60,14 @@ fn setup_display() -> (xcb::Connection, xcb::Window) {
         .nth(screen_num as usize)
         .expect("Could not get default screen")
         .root();
+
+    setup_atoms(&conn);
+
+    (conn, root)
+}
+
+fn setup_atoms(conn: &xcb::Connection) {
+    use xcb::intern_atom;
 
     let wm_state_cookie = intern_atom(&conn, false, "WM_STATE");
     let wm_change_state_cookie = intern_atom(&conn, false, "WM_CHANGE_STATE");
@@ -73,6 +80,4 @@ fn setup_display() -> (xcb::Connection, xcb::Window) {
     let wm_protos = wm_protos_cookie.get_reply().unwrap();
     let wm_delete = wm_delete_cookie.get_reply().unwrap();
     let wm_cmapwins = wm_cmapwins_cookie.get_reply().unwrap();
-
-    (conn, root)
 }
