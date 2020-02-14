@@ -52,6 +52,7 @@ fn scan_wins(conn: &xcb::Connection, root: xcb::Window) {
 }
 
 fn setup_display() -> (xcb::Connection, xcb::Window) {
+    use xcb::{intern_atom, alloc_named_color};
     let (conn, screen_num) = xcb::Connection::connect(None)
         .expect("Could not connect to X server");
     let setup = conn.get_setup();
@@ -61,11 +62,11 @@ fn setup_display() -> (xcb::Connection, xcb::Window) {
         .expect("Could not get default screen")
         .root();
 
-    let wm_state_cookie = xcb::intern_atom(&conn, false, "WM_STATE");
-    let wm_change_state_cookie = xcb::intern_atom(&conn, false, "WM_CHANGE_STATE");
-    let wm_protos_cookie = xcb::intern_atom(&conn, false, "WM_PROTOCOLS");
-    let wm_delete_cookie = xcb::intern_atom(&conn, false, "WM_DELETE_WINDOW");
-    let wm_cmapwins_cookie = xcb::intern_atom(&conn, false, "WM_COLORMAP_WINDOWS");
+    let wm_state_cookie = intern_atom(&conn, false, "WM_STATE");
+    let wm_change_state_cookie = intern_atom(&conn, false, "WM_CHANGE_STATE");
+    let wm_protos_cookie = intern_atom(&conn, false, "WM_PROTOCOLS");
+    let wm_delete_cookie = intern_atom(&conn, false, "WM_DELETE_WINDOW");
+    let wm_cmapwins_cookie = intern_atom(&conn, false, "WM_COLORMAP_WINDOWS");
 
     let wm_state = wm_state_cookie.get_reply().unwrap();
     let wm_change_state = wm_change_state_cookie.get_reply().unwrap();
