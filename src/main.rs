@@ -1,7 +1,7 @@
 extern crate getopts;
 extern crate xcb;
 
-use getopts::Options;
+use getopts::{Options, Matches};
 use std::convert::TryInto;
 use std::env;
 
@@ -25,7 +25,12 @@ fn main() {
     opts.optopt("", "empty", "set empty color", "COLOR");
     opts.optopt("", "display", "set X11 display", "DISPLAY");
 
-    let (conn, root) = setup_display(&opts);
+    let matches = match opts.parse(&args[1..]) {
+        Ok(m) => { m }
+        Err(f) => { panic!(f.to_string()) }
+    };
+
+    let (conn, root) = setup_display(&matches);
     menufile::get_menuitems();
     taskbar::make_taskbar();
     scan_wins(&conn, root);
@@ -51,17 +56,20 @@ fn scan_wins(conn: &xcb::Connection, root: xcb::Window) {
     }
 }
 
-fn setup_display(opts: &Options) -> (xcb::Connection, xcb::Window) {
+fn setup_display(matches: &Matches) -> (xcb::Connection, xcb::Window) {
     let (conn, screen_num) = xcb::Connection::connect(None)
         .expect("Could not connect to X server");
     let setup = conn.get_setup();
-    let root = setup
+    let screen = setup
         .roots()
         .nth(screen_num as usize)
-        .expect("Could not get default screen")
-        .root();
+        .expect("Could not get default screen");
+
+    let root = screen.root();
+    let cmap = screen.default_colormap();
 
     setup_atoms(&conn);
+    setup_colors(&conn, cmap, matches);
 
     (conn, root)
 }
@@ -80,4 +88,16 @@ fn setup_atoms(conn: &xcb::Connection) {
     let wm_protos = wm_protos_cookie.get_reply().unwrap();
     let wm_delete = wm_delete_cookie.get_reply().unwrap();
     let wm_cmapwins = wm_cmapwins_cookie.get_reply().unwrap();
+}
+
+fn setup_colors(conn: &xcb::Connection, cmap: xcb::Colormap, matches: &Matches) {
+    use xcb::alloc_named_color;
+
+    let border_cookie = alloc_named_color(conn, cmap, &matches.opt_str("border").unwrap());
+    let text_cookie = alloc_named_color(conn, cmap, &matches.opt_str("text").unwrap());
+    let active_cookie = alloc_named_color(conn, cmap, &matches.opt_str("active").unwrap());
+    let inactive_cookie = alloc_named_color(conn, cmap, &matches.opt_str("inactive").unwrap());
+    let menu_cookie = alloc_named_color(conn, cmap, &matches.opt_str("menu").unwrap());
+    let selected_cookie = alloc_named_color(conn, cmap, &matches.opt_str("selected").unwrap());
+    let empty_cookie = alloc_named_color(conn, cmap, &matches.opt_str("empty").unwrap());
 }
