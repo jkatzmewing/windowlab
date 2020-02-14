@@ -52,5 +52,14 @@ fn scan_wins(conn: &xcb::Connection, root: xcb::Window) {
 }
 
 fn setup_display() -> (xcb::Connection, xcb::Window) {
-    std::unimplemented!();
+    let (conn, screen_num) = xcb::Connection::connect(None)
+        .expect("Could not connect to X server");
+    let setup = conn.get_setup();
+    let root = setup
+        .roots()
+        .nth(screen_num as usize)
+        .expect("Could not get default screen")
+        .root();
+
+    (conn, root)
 }
