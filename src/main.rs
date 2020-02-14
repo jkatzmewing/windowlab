@@ -61,5 +61,17 @@ fn setup_display() -> (xcb::Connection, xcb::Window) {
         .expect("Could not get default screen")
         .root();
 
+    let wm_state_cookie = xcb::intern_atom(&conn, false, "WM_STATE");
+    let wm_change_state_cookie = xcb::intern_atom(&conn, false, "WM_CHANGE_STATE");
+    let wm_protos_cookie = xcb::intern_atom(&conn, false, "WM_PROTOCOLS");
+    let wm_delete_cookie = xcb::intern_atom(&conn, false, "WM_DELETE_WINDOW");
+    let wm_cmapwins_cookie = xcb::intern_atom(&conn, false, "WM_COLORMAP_WINDOWS");
+
+    let wm_state = wm_state_cookie.get_reply().unwrap();
+    let wm_change_state = wm_change_state_cookie.get_reply().unwrap();
+    let wm_protos = wm_protos_cookie.get_reply().unwrap();
+    let wm_delete = wm_delete_cookie.get_reply().unwrap();
+    let wm_cmapwins = wm_cmapwins_cookie.get_reply().unwrap();
+
     (conn, root)
 }
