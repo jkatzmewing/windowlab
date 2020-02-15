@@ -100,4 +100,12 @@ fn setup_colors(conn: &xcb::Connection, cmap: xcb::Colormap, matches: &Matches) 
     let menu_cookie = alloc_named_color(conn, cmap, &matches.opt_str("menu").unwrap());
     let selected_cookie = alloc_named_color(conn, cmap, &matches.opt_str("selected").unwrap());
     let empty_cookie = alloc_named_color(conn, cmap, &matches.opt_str("empty").unwrap());
+
+    let border = border_cookie.get_reply();
+    let text = text_cookie.get_reply();
+    let active = active_cookie.get_reply();
+    let inactive = inactive_cookie.get_reply();
+    let menu = menu_cookie.get_reply();
+    let selected = selected_cookie.get_reply();
+    let empty = empty_cookie.get_reply();
 }
