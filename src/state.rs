@@ -1,7 +1,7 @@
 use getopts::Matches;
 use xcb;
-use xcb::{Atom, Cursor, Gc};
 use xcb::render::Color;
+use xcb::{Atom, Cursor, Gc};
 
 pub struct Style {
     pub string_gc: Gc,
@@ -28,11 +28,7 @@ pub struct Style {
 }
 
 impl Style {
-    pub fn new(
-        conn: &xcb::Connection,
-        cmap: xcb::Colormap,
-        matches: &Matches,
-    ) -> Style {
+    pub fn new(conn: &xcb::Connection, cmap: xcb::Colormap, matches: &Matches) -> Style {
         use xcb::alloc_named_color;
 
         std::unimplemented!();

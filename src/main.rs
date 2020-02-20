@@ -1,7 +1,7 @@
 extern crate getopts;
 extern crate xcb;
 
-use getopts::{Options, Matches};
+use getopts::{Matches, Options};
 use std::convert::TryInto;
 use std::env;
 
@@ -29,8 +29,8 @@ fn main() {
     opts.optopt("", "display", "set X11 display", "DISPLAY");
 
     let matches = match opts.parse(&args[1..]) {
-        Ok(m) => { m }
-        Err(f) => { panic!(f.to_string()) }
+        Ok(m) => m,
+        Err(f) => panic!(f.to_string()),
     };
 
     let (conn, root, style, wmstate) = setup_display(&matches);
@@ -44,15 +44,11 @@ fn scan_wins(conn: &xcb::Connection, root: xcb::Window) {
     let reply = xcb::query_tree(conn, root).get_reply();
     let mut attr: xcb::GetWindowAttributesReply;
     for w in reply.unwrap().children().iter() {
-        let attr_reply = xcb::get_window_attributes(
-            conn,
-            *w,
-        ).get_reply();
+        let attr_reply = xcb::get_window_attributes(conn, *w).get_reply();
         attr = attr_reply.unwrap();
-        if !attr.override_redirect() &&
-            attr.map_state() == xcb::MAP_STATE_VIEWABLE
-                .try_into()
-                .unwrap() {
+        if !attr.override_redirect()
+            && attr.map_state() == xcb::MAP_STATE_VIEWABLE.try_into().unwrap()
+        {
             reparent::make_new_client(*w);
         }
     }
@@ -61,8 +57,7 @@ fn scan_wins(conn: &xcb::Connection, root: xcb::Window) {
 fn setup_display(
     matches: &Matches,
 ) -> (xcb::Connection, xcb::Window, state::Style, state::WmState) {
-    let (conn, screen_num) = xcb::Connection::connect(None)
-        .expect("Could not connect to X server");
+    let (conn, screen_num) = xcb::Connection::connect(None).expect("Could not connect to X server");
     let setup = conn.get_setup();
     let screen = setup
         .roots()
@@ -77,5 +72,3 @@ fn setup_display(
 
     (conn, root, style, wmstate)
 }
-
-
