@@ -5,13 +5,14 @@ use getopts::{Matches, Options};
 use std::convert::TryInto;
 use std::env;
 
+mod client;
 mod events;
 mod menufile;
 mod reparent;
 mod state;
 mod taskbar;
 
-use state::{Style, WmState};
+use state::TotalState;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -33,7 +34,7 @@ fn main() {
         Err(f) => panic!(f.to_string()),
     };
 
-    let (conn, root, style, wmstate) = setup_display(&matches);
+    let (conn, root, state) = setup_display(&matches);
     menufile::get_menuitems();
     taskbar::make_taskbar();
     scan_wins(&conn, root);
@@ -56,7 +57,7 @@ fn scan_wins(conn: &xcb::Connection, root: xcb::Window) {
 
 fn setup_display(
     matches: &Matches,
-) -> (xcb::Connection, xcb::Window, state::Style, state::WmState) {
+) -> (xcb::Connection, xcb::Window, state::TotalState) {
     let (conn, screen_num) = xcb::Connection::connect(None).expect("Could not connect to X server");
     let setup = conn.get_setup();
     let screen = setup
@@ -67,8 +68,7 @@ fn setup_display(
     let root = screen.root();
     let cmap = screen.default_colormap();
 
-    let wmstate = WmState::new(&conn);
-    let style = Style::new(&conn, cmap, matches);
+    let state = TotalState::new(&conn, &cmap, matches);
 
-    (conn, root, style, wmstate)
+    (conn, root, state)
 }

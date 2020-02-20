@@ -3,6 +3,28 @@ use xcb;
 use xcb::render::Color;
 use xcb::{Atom, Cursor, Gc};
 
+use crate::client::Client;
+
+pub struct TotalState {
+    pub style: Style,
+    pub wm_state: WmState,
+    pub client_state: ClientState,
+}
+
+impl TotalState {
+    pub fn new(
+        conn: &xcb::Connection,
+        cmap: &xcb::Colormap,
+        matches: &Matches,
+    ) -> Self {
+        TotalState {
+            style: Style::new(conn, *cmap, matches),
+            wm_state: WmState::new(conn),
+            client_state: ClientState::new(),
+        }
+    }
+}
+
 pub struct Style {
     pub string_gc: Gc,
     pub border_gc: Gc,
@@ -28,7 +50,7 @@ pub struct Style {
 }
 
 impl Style {
-    pub fn new(conn: &xcb::Connection, cmap: xcb::Colormap, matches: &Matches) -> Style {
+    fn new(conn: &xcb::Connection, cmap: xcb::Colormap, matches: &Matches) -> Self {
         use xcb::alloc_named_color;
 
         std::unimplemented!();
@@ -60,7 +82,7 @@ pub struct WmState {
 }
 
 impl WmState {
-    pub fn new(conn: &xcb::Connection) -> WmState {
+    fn new(conn: &xcb::Connection) -> Self {
         use xcb::intern_atom;
 
         let wm_state_cookie = intern_atom(&conn, false, "WM_STATE");
@@ -69,7 +91,7 @@ impl WmState {
         let wm_delete_cookie = intern_atom(&conn, false, "WM_DELETE_WINDOW");
         let wm_cmapwins_cookie = intern_atom(&conn, false, "WM_COLORMAP_WINDOWS");
 
-        let wmstate = WmState {
+        let wm_state = WmState {
             state: wm_state_cookie.get_reply().unwrap().atom(),
             change_state: wm_change_state_cookie.get_reply().unwrap().atom(),
             protos: wm_protos_cookie.get_reply().unwrap().atom(),
@@ -77,6 +99,24 @@ impl WmState {
             cmapwins: wm_cmapwins_cookie.get_reply().unwrap().atom(),
         };
 
-        wmstate
+        wm_state
+    }
+}
+
+pub struct ClientState {
+    pub head_client: Option<Client>,
+    pub focused_client: Option<Client>,
+    pub topmost_client: Option<Client>,
+    pub fullscreen_client: Option<Client>,
+}
+
+impl ClientState {
+    fn new() -> Self {
+        ClientState {
+            head_client: None,
+            focused_client: None,
+            topmost_client: None,
+            fullscreen_client: None,
+        }
     }
 }
