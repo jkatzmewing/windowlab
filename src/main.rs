@@ -34,14 +34,14 @@ fn main() {
         Err(f) => panic!(f.to_string()),
     };
 
-    let (conn, root, state) = setup_display(&matches);
+    let (conn, root, mut state) = setup_display(&matches);
     menufile::get_menuitems();
     taskbar::make_taskbar();
-    scan_wins(&conn, root);
+    scan_wins(&conn, root, &mut state);
     events::do_event_loop();
 }
 
-fn scan_wins(conn: &xcb::Connection, root: xcb::Window) {
+fn scan_wins(conn: &xcb::Connection, root: xcb::Window, state: &mut TotalState) {
     let reply = xcb::query_tree(conn, root).get_reply();
     let mut attr: xcb::GetWindowAttributesReply;
     for w in reply.unwrap().children().iter() {
@@ -50,7 +50,7 @@ fn scan_wins(conn: &xcb::Connection, root: xcb::Window) {
         if !attr.override_redirect()
             && attr.map_state() == xcb::MAP_STATE_VIEWABLE.try_into().unwrap()
         {
-            reparent::make_new_client(*w);
+            reparent::make_new_client(*w, state);
         }
     }
 }
