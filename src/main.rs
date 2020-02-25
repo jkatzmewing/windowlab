@@ -38,7 +38,7 @@ fn main() {
     menufile::get_menuitems();
     taskbar::make_taskbar();
     scan_wins(&conn, root, &mut state);
-    events::do_event_loop();
+    events::do_event_loop(&conn, root, &mut state);
 }
 
 fn scan_wins(conn: &xcb::Connection, root: xcb::Window, state: &mut TotalState) {
