@@ -23,6 +23,27 @@ pub fn do_event_loop(
                     };
                     handle_button_press(conn, root, state, ev);
                 },
+
+                xcb::CONFIGURE_REQUEST => {
+                    let ev: &xcb::ConfigureRequestEvent = unsafe {
+                        xcb::cast_event(&ev)
+                    };
+                    handle_configure_request(conn, root, state, ev);
+                },
+
+                xcb::MAP_REQUEST => {
+                    let ev: &xcb::MapRequestEvent = unsafe {
+                        xcb::cast_event(&ev)
+                    };
+                    handle_map_request(conn, root, state, ev);
+                }
+
+                xcb::UNMAP_NOTIFY => {
+                    let ev: &xcb::UnmapNotifyEvent = unsafe {
+                        xcb::cast_event(&ev)
+                    };
+                    handle_unmap_event(conn, root, state, ev);
+                }
                 
                 _ => {}, // TODO other conditions
             }
@@ -44,6 +65,33 @@ fn handle_button_press(
     root: xcb::Window,
     state: &mut TotalState,
     ev: &xcb::ButtonPressEvent,
+) {
+    std::unimplemented!();
+}
+
+fn handle_configure_request(
+    conn: &xcb::Connection,
+    root: xcb::Window,
+    state: &mut TotalState,
+    ev: &xcb::ConfigureRequestEvent,
+) {
+    std::unimplemented!();
+}
+
+fn handle_map_request(
+    conn: &xcb::Connection,
+    root: xcb::Window,
+    state: &mut TotalState,
+    ev: &xcb::MapRequestEvent,
+) {
+    std::unimplemented!();
+}
+
+fn handle_unmap_event(
+    conn: &xcb::Connection,
+    root: xcb::Window,
+    state: &mut TotalState,
+    ev: &xcb::UnmapNotifyEvent,
 ) {
     std::unimplemented!();
 }
