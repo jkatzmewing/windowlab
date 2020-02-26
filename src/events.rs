@@ -46,6 +46,21 @@ pub fn do_event_loop(conn: &xcb::Connection, root: xcb::Window, state: &mut Tota
                     handle_colormap_change(conn, root, state, ev);
                 }
 
+                xcb::PROPERTY_NOTIFY => {
+                    let ev: &xcb::PropertyNotifyEvent = unsafe { xcb::cast_event(&ev) };
+                    handle_property_change(conn, root, state, ev);
+                }
+
+                xcb::ENTER_NOTIFY => {
+                    let ev: &xcb::EnterNotifyEvent = unsafe { xcb::cast_event(&ev) };
+                    handle_enter_event(conn, root, state, ev);
+                }
+
+                xcb::EXPOSE => {
+                    let ev: &xcb::ExposeEvent = unsafe { xcb::cast_event(&ev) };
+                    handle_expose_event(conn, root, state, ev);
+                }
+
                 _ => {} // TODO other conditions
             }
         }
@@ -120,6 +135,33 @@ fn handle_colormap_change(
     root: xcb::Window,
     state: &mut TotalState,
     ev: &xcb::ColormapNotifyEvent,
+) {
+    std::unimplemented!();
+}
+
+fn handle_property_change(
+    conn: &xcb::Connection,
+    root: xcb::Window,
+    state: &mut TotalState,
+    ev: &xcb::PropertyNotifyEvent,
+) {
+    std::unimplemented!();
+}
+
+fn handle_enter_event(
+    conn: &xcb::Connection,
+    root: xcb::Window,
+    state: &mut TotalState,
+    ev: &xcb::EnterNotifyEvent,
+) {
+    std::unimplemented!();
+}
+
+fn handle_expose_event(
+    conn: &xcb::Connection,
+    root: xcb::Window,
+    state: &mut TotalState,
+    ev: &xcb::ExposeEvent,
 ) {
     std::unimplemented!();
 }
