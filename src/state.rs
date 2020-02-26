@@ -12,11 +12,7 @@ pub struct TotalState {
 }
 
 impl TotalState {
-    pub fn new(
-        conn: &xcb::Connection,
-        cmap: &xcb::Colormap,
-        matches: &Matches,
-    ) -> Self {
+    pub fn new(conn: &xcb::Connection, cmap: &xcb::Colormap, matches: &Matches) -> Self {
         TotalState {
             style: Style::new(conn, *cmap, matches),
             wm_state: WmState::new(conn),

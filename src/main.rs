@@ -55,9 +55,7 @@ fn scan_wins(conn: &xcb::Connection, root: xcb::Window, state: &mut TotalState) 
     }
 }
 
-fn setup_display(
-    matches: &Matches,
-) -> (xcb::Connection, xcb::Window, state::TotalState) {
+fn setup_display(matches: &Matches) -> (xcb::Connection, xcb::Window, state::TotalState) {
     let (conn, screen_num) = xcb::Connection::connect(None).expect("Could not connect to X server");
     let setup = conn.get_setup();
     let screen = setup
