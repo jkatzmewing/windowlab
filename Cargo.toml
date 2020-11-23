@@ -23,6 +23,7 @@ name = "windowlab"
 [dependencies]
 c2rust-asm-casts = "0.1"
 libc = "0.2"
+x11 = "2.18"
 
 
 

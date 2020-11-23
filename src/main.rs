@@ -2,10 +2,11 @@
          non_upper_case_globals, unused_assignments, unused_mut)]
 #![register_tool(c2rust)]
 #![feature(const_raw_ptr_to_usize_cast, extern_types, main, register_tool)]
+
+extern crate x11;
+use x11::xlib::*;
 use ::c2rust_out::*;
 extern "C" {
-    pub type _XGC;
-    pub type _XDisplay;
     pub type _XPrivate;
     pub type _XrmHashBucketRec;
     #[no_mangle]
@@ -13,46 +14,6 @@ extern "C" {
     #[no_mangle]
     fn sigaction(__sig: libc::c_int, __act: *const sigaction,
                  __oact: *mut sigaction) -> libc::c_int;
-    #[no_mangle]
-    fn XLoadQueryFont(_: *mut Display, _: *const libc::c_char)
-     -> *mut XFontStruct;
-    #[no_mangle]
-    fn XGetModifierMapping(_: *mut Display) -> *mut XModifierKeymap;
-    #[no_mangle]
-    fn XOpenDisplay(_: *const libc::c_char) -> *mut Display;
-    #[no_mangle]
-    fn XInternAtom(_: *mut Display, _: *const libc::c_char, _: libc::c_int)
-     -> Atom;
-    #[no_mangle]
-    fn XCreateFontCursor(_: *mut Display, _: libc::c_uint) -> Cursor;
-    #[no_mangle]
-    fn XCreateGC(_: *mut Display, _: Drawable, _: libc::c_ulong,
-                 _: *mut XGCValues) -> GC;
-    #[no_mangle]
-    fn XSetErrorHandler(_: XErrorHandler) -> XErrorHandler;
-    #[no_mangle]
-    fn XAllocColor(_: *mut Display, _: Colormap, _: *mut XColor)
-     -> libc::c_int;
-    #[no_mangle]
-    fn XAllocNamedColor(_: *mut Display, _: Colormap, _: *const libc::c_char,
-                        _: *mut XColor, _: *mut XColor) -> libc::c_int;
-    #[no_mangle]
-    fn XChangeWindowAttributes(_: *mut Display, _: Window, _: libc::c_ulong,
-                               _: *mut XSetWindowAttributes) -> libc::c_int;
-    #[no_mangle]
-    fn XFree(_: *mut libc::c_void) -> libc::c_int;
-    #[no_mangle]
-    fn XGetWindowAttributes(_: *mut Display, _: Window,
-                            _: *mut XWindowAttributes) -> libc::c_int;
-    #[no_mangle]
-    fn XGrabKey(_: *mut Display, _: libc::c_int, _: libc::c_uint, _: Window,
-                _: libc::c_int, _: libc::c_int, _: libc::c_int)
-     -> libc::c_int;
-    #[no_mangle]
-    fn XKeysymToKeycode(_: *mut Display, _: KeySym) -> KeyCode;
-    #[no_mangle]
-    fn XQueryTree(_: *mut Display, _: Window, _: *mut Window, _: *mut Window,
-                  _: *mut *mut Window, _: *mut libc::c_uint) -> libc::c_int;
     #[no_mangle]
     fn exit(_: libc::c_int) -> !;
     #[no_mangle]
@@ -191,170 +152,7 @@ pub union C2RustUnnamed_9 {
                                                   _: *mut libc::c_void)
                                  -> ()>,
 }
-pub type XID = libc::c_ulong;
-pub type Atom = libc::c_ulong;
-pub type VisualID = libc::c_ulong;
-pub type Window = XID;
-pub type Drawable = XID;
-pub type Font = XID;
-pub type Pixmap = XID;
-pub type Cursor = XID;
-pub type Colormap = XID;
-pub type KeySym = XID;
-pub type KeyCode = libc::c_uchar;
-pub type XPointer = *mut libc::c_char;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _XExtData {
-    pub number: libc::c_int,
-    pub next: *mut _XExtData,
-    pub free_private: Option<unsafe extern "C" fn(_: *mut _XExtData)
-                                 -> libc::c_int>,
-    pub private_data: XPointer,
-}
-pub type XExtData = _XExtData;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XGCValues {
-    pub function: libc::c_int,
-    pub plane_mask: libc::c_ulong,
-    pub foreground: libc::c_ulong,
-    pub background: libc::c_ulong,
-    pub line_width: libc::c_int,
-    pub line_style: libc::c_int,
-    pub cap_style: libc::c_int,
-    pub join_style: libc::c_int,
-    pub fill_style: libc::c_int,
-    pub fill_rule: libc::c_int,
-    pub arc_mode: libc::c_int,
-    pub tile: Pixmap,
-    pub stipple: Pixmap,
-    pub ts_x_origin: libc::c_int,
-    pub ts_y_origin: libc::c_int,
-    pub font: Font,
-    pub subwindow_mode: libc::c_int,
-    pub graphics_exposures: libc::c_int,
-    pub clip_x_origin: libc::c_int,
-    pub clip_y_origin: libc::c_int,
-    pub clip_mask: Pixmap,
-    pub dash_offset: libc::c_int,
-    pub dashes: libc::c_char,
-}
-pub type GC = *mut _XGC;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Visual {
-    pub ext_data: *mut XExtData,
-    pub visualid: VisualID,
-    pub class: libc::c_int,
-    pub red_mask: libc::c_ulong,
-    pub green_mask: libc::c_ulong,
-    pub blue_mask: libc::c_ulong,
-    pub bits_per_rgb: libc::c_int,
-    pub map_entries: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Depth {
-    pub depth: libc::c_int,
-    pub nvisuals: libc::c_int,
-    pub visuals: *mut Visual,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Screen {
-    pub ext_data: *mut XExtData,
-    pub display: *mut _XDisplay,
-    pub root: Window,
-    pub width: libc::c_int,
-    pub height: libc::c_int,
-    pub mwidth: libc::c_int,
-    pub mheight: libc::c_int,
-    pub ndepths: libc::c_int,
-    pub depths: *mut Depth,
-    pub root_depth: libc::c_int,
-    pub root_visual: *mut Visual,
-    pub default_gc: GC,
-    pub cmap: Colormap,
-    pub white_pixel: libc::c_ulong,
-    pub black_pixel: libc::c_ulong,
-    pub max_maps: libc::c_int,
-    pub min_maps: libc::c_int,
-    pub backing_store: libc::c_int,
-    pub save_unders: libc::c_int,
-    pub root_input_mask: libc::c_long,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct ScreenFormat {
-    pub ext_data: *mut XExtData,
-    pub depth: libc::c_int,
-    pub bits_per_pixel: libc::c_int,
-    pub scanline_pad: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XSetWindowAttributes {
-    pub background_pixmap: Pixmap,
-    pub background_pixel: libc::c_ulong,
-    pub border_pixmap: Pixmap,
-    pub border_pixel: libc::c_ulong,
-    pub bit_gravity: libc::c_int,
-    pub win_gravity: libc::c_int,
-    pub backing_store: libc::c_int,
-    pub backing_planes: libc::c_ulong,
-    pub backing_pixel: libc::c_ulong,
-    pub save_under: libc::c_int,
-    pub event_mask: libc::c_long,
-    pub do_not_propagate_mask: libc::c_long,
-    pub override_redirect: libc::c_int,
-    pub colormap: Colormap,
-    pub cursor: Cursor,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XWindowAttributes {
-    pub x: libc::c_int,
-    pub y: libc::c_int,
-    pub width: libc::c_int,
-    pub height: libc::c_int,
-    pub border_width: libc::c_int,
-    pub depth: libc::c_int,
-    pub visual: *mut Visual,
-    pub root: Window,
-    pub class: libc::c_int,
-    pub bit_gravity: libc::c_int,
-    pub win_gravity: libc::c_int,
-    pub backing_store: libc::c_int,
-    pub backing_planes: libc::c_ulong,
-    pub backing_pixel: libc::c_ulong,
-    pub save_under: libc::c_int,
-    pub colormap: Colormap,
-    pub map_installed: libc::c_int,
-    pub map_state: libc::c_int,
-    pub all_event_masks: libc::c_long,
-    pub your_event_mask: libc::c_long,
-    pub do_not_propagate_mask: libc::c_long,
-    pub override_redirect: libc::c_int,
-    pub screen: *mut Screen,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XColor {
-    pub pixel: libc::c_ulong,
-    pub red: libc::c_ushort,
-    pub green: libc::c_ushort,
-    pub blue: libc::c_ushort,
-    pub flags: libc::c_char,
-    pub pad: libc::c_char,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XModifierKeymap {
-    pub max_keypermod: libc::c_int,
-    pub modifiermap: *mut KeyCode,
-}
-pub type Display = _XDisplay;
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_10 {
@@ -406,77 +204,7 @@ pub struct C2RustUnnamed_10 {
     pub xdefaults: *mut libc::c_char,
 }
 pub type _XPrivDisplay = *mut C2RustUnnamed_10;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XErrorEvent {
-    pub type_0: libc::c_int,
-    pub display: *mut Display,
-    pub resourceid: XID,
-    pub serial: libc::c_ulong,
-    pub error_code: libc::c_uchar,
-    pub request_code: libc::c_uchar,
-    pub minor_code: libc::c_uchar,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XCharStruct {
-    pub lbearing: libc::c_short,
-    pub rbearing: libc::c_short,
-    pub width: libc::c_short,
-    pub ascent: libc::c_short,
-    pub descent: libc::c_short,
-    pub attributes: libc::c_ushort,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XFontProp {
-    pub name: Atom,
-    pub card32: libc::c_ulong,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XFontStruct {
-    pub ext_data: *mut XExtData,
-    pub fid: Font,
-    pub direction: libc::c_uint,
-    pub min_char_or_byte2: libc::c_uint,
-    pub max_char_or_byte2: libc::c_uint,
-    pub min_byte1: libc::c_uint,
-    pub max_byte1: libc::c_uint,
-    pub all_chars_exist: libc::c_int,
-    pub default_char: libc::c_uint,
-    pub n_properties: libc::c_int,
-    pub properties: *mut XFontProp,
-    pub min_bounds: XCharStruct,
-    pub max_bounds: XCharStruct,
-    pub per_char: *mut XCharStruct,
-    pub ascent: libc::c_int,
-    pub descent: libc::c_int,
-}
-pub type XErrorHandler
-    =
-    Option<unsafe extern "C" fn(_: *mut Display, _: *mut XErrorEvent)
-               -> libc::c_int>;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XSizeHints {
-    pub flags: libc::c_long,
-    pub x: libc::c_int,
-    pub y: libc::c_int,
-    pub width: libc::c_int,
-    pub height: libc::c_int,
-    pub min_width: libc::c_int,
-    pub min_height: libc::c_int,
-    pub max_width: libc::c_int,
-    pub max_height: libc::c_int,
-    pub width_inc: libc::c_int,
-    pub height_inc: libc::c_int,
-    pub min_aspect: C2RustUnnamed_11,
-    pub max_aspect: C2RustUnnamed_11,
-    pub base_width: libc::c_int,
-    pub base_height: libc::c_int,
-    pub win_gravity: libc::c_int,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_11 {
