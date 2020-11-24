@@ -371,7 +371,9 @@ pub struct Rect {
 pub unsafe extern "C" fn do_event_loop() {
     let mut ev: XEvent = XEvent{type_: 0,};
     loop  {
-        interruptible_XNextEvent(&mut ev);
+        unsafe {
+            XNextEvent(dsply, &mut ev);
+        }
         /* check to see if menu rebuild has been requested */
         if do_menuitems != 0 { free_menuitems(); get_menuitems(); }
         match ev.type_ {
@@ -848,64 +850,4 @@ unsafe extern "C" fn handle_expose_event(mut e: *mut XExposeEvent) {
 unsafe extern "C" fn handle_shape_change(mut e: *mut XShapeEvent) {
     let mut c: *mut Client = find_client((*e).window, 0 as libc::c_int);
     if !c.is_null() { set_shape(c); };
-}
-/* interruptibleXNextEvent() was originally taken from Blender's source code
- * and came with the following copyright notice: */
-/* Copyright (c) Mark J. Kilgard, 1994, 1995, 1996. */
-/* This program is freely distributable without licensing fees
- * and is provided without guarantee or warrantee expressed or
- * implied. This program is -not- in the public domain. */
-/* Unlike XNextEvent, if a signal arrives, interruptibleXNextEvent will
- * return zero. */
-unsafe extern "C" fn interruptible_XNextEvent(mut event: *mut XEvent)
- -> libc::c_int {
-    let mut fds: fd_set = fd_set{__fds_bits: [0; 16],};
-    let mut rc: libc::c_int = 0;
-    let mut dsply_fd: libc::c_int = (*(dsply as _XPrivDisplay)).fd;
-    loop  {
-        if XPending(dsply) != 0 {
-            XNextEvent(dsply, event);
-            return 1 as libc::c_int
-        }
-        let mut __d0: libc::c_int = 0;
-        let mut __d1: libc::c_int = 0;
-        let fresh0 = &mut __d0;
-        let fresh1;
-        let fresh2 = &mut __d1;
-        let fresh3;
-        let fresh4 =
-            (::std::mem::size_of::<fd_set>() as
-                 libc::c_ulong).wrapping_div(::std::mem::size_of::<__fd_mask>()
-                                                 as libc::c_ulong);
-        let fresh5 =
-            &mut *fds.__fds_bits.as_mut_ptr().offset(0 as libc::c_int as
-                                                         isize) as
-                *mut __fd_mask;
-        asm!("cld; rep; stosq" : "={cx}" (fresh1), "={di}" (fresh3) : "{ax}"
-             (0 as libc::c_int), "0"
-             (c2rust_asm_casts::AsmCast::cast_in(fresh0, fresh4)), "1"
-             (c2rust_asm_casts::AsmCast::cast_in(fresh2, fresh5)) : "memory" :
-             "volatile");
-        c2rust_asm_casts::AsmCast::cast_out(fresh0, fresh4, fresh1);
-        c2rust_asm_casts::AsmCast::cast_out(fresh2, fresh5, fresh3);
-        fds.__fds_bits[(dsply_fd /
-                            (8 as libc::c_int *
-                                 ::std::mem::size_of::<__fd_mask>() as
-                                     libc::c_ulong as libc::c_int)) as usize]
-            |=
-            ((1 as libc::c_ulong) <<
-                 dsply_fd %
-                     (8 as libc::c_int *
-                          ::std::mem::size_of::<__fd_mask>() as libc::c_ulong
-                              as libc::c_int)) as __fd_mask;
-        rc =
-            select(dsply_fd + 1 as libc::c_int, &mut fds, 0 as *mut fd_set,
-                   0 as *mut fd_set, 0 as *mut timeval);
-        if rc < 0 as libc::c_int {
-            if *__errno_location() == 4 as libc::c_int {
-                return 0 as libc::c_int
-            }
-            return 1 as libc::c_int
-        }
-    };
 }
