@@ -1,4 +1,6 @@
 use ::libc;
+use x11::xlib::*;
+
 extern "C" {
     pub type _IO_wide_data;
     pub type _IO_codecvt;
@@ -44,9 +46,6 @@ extern "C" {
     #[no_mangle]
     fn readlink(__path: *const libc::c_char, __buf: *mut libc::c_char,
                 __len: size_t) -> ssize_t;
-    #[no_mangle]
-    fn XTextWidth(_: *mut XFontStruct, _: *const libc::c_char, _: libc::c_int)
-     -> libc::c_int;
     #[no_mangle]
     static mut font: *mut XFontStruct;
     #[no_mangle]
@@ -124,26 +123,7 @@ pub struct XFontProp {
     pub name: Atom,
     pub card32: libc::c_ulong,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XFontStruct {
-    pub ext_data: *mut XExtData,
-    pub fid: Font,
-    pub direction: libc::c_uint,
-    pub min_char_or_byte2: libc::c_uint,
-    pub max_char_or_byte2: libc::c_uint,
-    pub min_byte1: libc::c_uint,
-    pub max_byte1: libc::c_uint,
-    pub all_chars_exist: libc::c_int,
-    pub default_char: libc::c_uint,
-    pub n_properties: libc::c_int,
-    pub properties: *mut XFontProp,
-    pub min_bounds: XCharStruct,
-    pub max_bounds: XCharStruct,
-    pub per_char: *mut XCharStruct,
-    pub ascent: libc::c_int,
-    pub descent: libc::c_int,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct MenuItem {
