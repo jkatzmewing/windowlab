@@ -3,12 +3,6 @@ use x11::xlib::*;
 
 extern "C" {
     #[no_mangle]
-    fn XGetWindowProperty(_: *mut Display, _: Window, _: Atom,
-                          _: libc::c_long, _: libc::c_long, _: libc::c_int,
-                          _: Atom, _: *mut Atom, _: *mut libc::c_int,
-                          _: *mut libc::c_ulong, _: *mut libc::c_ulong,
-                          _: *mut *mut libc::c_uchar) -> libc::c_int;
-    #[no_mangle]
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     #[no_mangle]
     fn free(__ptr: *mut libc::c_void);
