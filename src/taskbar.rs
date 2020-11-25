@@ -1,7 +1,7 @@
 use ::libc;
+use x11::xlib::*;
+
 extern "C" {
-    pub type _XGC;
-    pub type _XDisplay;
     pub type _XPrivate;
     pub type _XrmHashBucketRec;
     #[no_mangle]
@@ -12,43 +12,6 @@ extern "C" {
     fn strlen(_: *const libc::c_char) -> libc::c_ulong;
     #[no_mangle]
     static mut inactive_gc: GC;
-    #[no_mangle]
-    fn XCreateWindow(_: *mut Display, _: Window, _: libc::c_int,
-                     _: libc::c_int, _: libc::c_uint, _: libc::c_uint,
-                     _: libc::c_uint, _: libc::c_int, _: libc::c_uint,
-                     _: *mut Visual, _: libc::c_ulong,
-                     _: *mut XSetWindowAttributes) -> Window;
-    #[no_mangle]
-    fn XClearWindow(_: *mut Display, _: Window) -> libc::c_int;
-    #[no_mangle]
-    fn XDestroyWindow(_: *mut Display, _: Window) -> libc::c_int;
-    #[no_mangle]
-    fn XDrawLine(_: *mut Display, _: Drawable, _: GC, _: libc::c_int,
-                 _: libc::c_int, _: libc::c_int, _: libc::c_int)
-     -> libc::c_int;
-    #[no_mangle]
-    fn XDrawString(_: *mut Display, _: Drawable, _: GC, _: libc::c_int,
-                   _: libc::c_int, _: *const libc::c_char, _: libc::c_int)
-     -> libc::c_int;
-    #[no_mangle]
-    fn XFillRectangle(_: *mut Display, _: Drawable, _: GC, _: libc::c_int,
-                      _: libc::c_int, _: libc::c_uint, _: libc::c_uint)
-     -> libc::c_int;
-    #[no_mangle]
-    fn XGrabPointer(_: *mut Display, _: Window, _: libc::c_int,
-                    _: libc::c_uint, _: libc::c_int, _: libc::c_int,
-                    _: Window, _: Cursor, _: Time) -> libc::c_int;
-    #[no_mangle]
-    fn XMapWindow(_: *mut Display, _: Window) -> libc::c_int;
-    #[no_mangle]
-    fn XMaskEvent(_: *mut Display, _: libc::c_long, _: *mut XEvent)
-     -> libc::c_int;
-    #[no_mangle]
-    fn XPutBackEvent(_: *mut Display, _: *mut XEvent) -> libc::c_int;
-    #[no_mangle]
-    fn XUngrabPointer(_: *mut Display, _: Time) -> libc::c_int;
-    #[no_mangle]
-    fn XUnmapWindow(_: *mut Display, _: Window) -> libc::c_int;
     #[no_mangle]
     static mut dsply: *mut Display;
     #[no_mangle]
@@ -94,109 +57,7 @@ extern "C" {
     #[no_mangle]
     fn get_mouse_position(_: *mut libc::c_int, _: *mut libc::c_int);
 }
-pub type XID = libc::c_ulong;
-pub type Atom = libc::c_ulong;
-pub type VisualID = libc::c_ulong;
-pub type Time = libc::c_ulong;
-pub type Window = XID;
-pub type Drawable = XID;
-pub type Font = XID;
-pub type Pixmap = XID;
-pub type Cursor = XID;
-pub type Colormap = XID;
-pub type XPointer = *mut libc::c_char;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _XExtData {
-    pub number: libc::c_int,
-    pub next: *mut _XExtData,
-    pub free_private: Option<unsafe extern "C" fn(_: *mut _XExtData)
-                                 -> libc::c_int>,
-    pub private_data: XPointer,
-}
-pub type XExtData = _XExtData;
-pub type GC = *mut _XGC;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Visual {
-    pub ext_data: *mut XExtData,
-    pub visualid: VisualID,
-    pub class: libc::c_int,
-    pub red_mask: libc::c_ulong,
-    pub green_mask: libc::c_ulong,
-    pub blue_mask: libc::c_ulong,
-    pub bits_per_rgb: libc::c_int,
-    pub map_entries: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Depth {
-    pub depth: libc::c_int,
-    pub nvisuals: libc::c_int,
-    pub visuals: *mut Visual,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Screen {
-    pub ext_data: *mut XExtData,
-    pub display: *mut _XDisplay,
-    pub root: Window,
-    pub width: libc::c_int,
-    pub height: libc::c_int,
-    pub mwidth: libc::c_int,
-    pub mheight: libc::c_int,
-    pub ndepths: libc::c_int,
-    pub depths: *mut Depth,
-    pub root_depth: libc::c_int,
-    pub root_visual: *mut Visual,
-    pub default_gc: GC,
-    pub cmap: Colormap,
-    pub white_pixel: libc::c_ulong,
-    pub black_pixel: libc::c_ulong,
-    pub max_maps: libc::c_int,
-    pub min_maps: libc::c_int,
-    pub backing_store: libc::c_int,
-    pub save_unders: libc::c_int,
-    pub root_input_mask: libc::c_long,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct ScreenFormat {
-    pub ext_data: *mut XExtData,
-    pub depth: libc::c_int,
-    pub bits_per_pixel: libc::c_int,
-    pub scanline_pad: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XSetWindowAttributes {
-    pub background_pixmap: Pixmap,
-    pub background_pixel: libc::c_ulong,
-    pub border_pixmap: Pixmap,
-    pub border_pixel: libc::c_ulong,
-    pub bit_gravity: libc::c_int,
-    pub win_gravity: libc::c_int,
-    pub backing_store: libc::c_int,
-    pub backing_planes: libc::c_ulong,
-    pub backing_pixel: libc::c_ulong,
-    pub save_under: libc::c_int,
-    pub event_mask: libc::c_long,
-    pub do_not_propagate_mask: libc::c_long,
-    pub override_redirect: libc::c_int,
-    pub colormap: Colormap,
-    pub cursor: Cursor,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XColor {
-    pub pixel: libc::c_ulong,
-    pub red: libc::c_ushort,
-    pub green: libc::c_ushort,
-    pub blue: libc::c_ushort,
-    pub flags: libc::c_char,
-    pub pad: libc::c_char,
-}
-pub type Display = _XDisplay;
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed {
@@ -248,382 +109,7 @@ pub struct C2RustUnnamed {
     pub xdefaults: *mut libc::c_char,
 }
 pub type _XPrivDisplay = *mut C2RustUnnamed;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XKeyEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub window: Window,
-    pub root: Window,
-    pub subwindow: Window,
-    pub time: Time,
-    pub x: libc::c_int,
-    pub y: libc::c_int,
-    pub x_root: libc::c_int,
-    pub y_root: libc::c_int,
-    pub state: libc::c_uint,
-    pub keycode: libc::c_uint,
-    pub same_screen: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XButtonEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub window: Window,
-    pub root: Window,
-    pub subwindow: Window,
-    pub time: Time,
-    pub x: libc::c_int,
-    pub y: libc::c_int,
-    pub x_root: libc::c_int,
-    pub y_root: libc::c_int,
-    pub state: libc::c_uint,
-    pub button: libc::c_uint,
-    pub same_screen: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XMotionEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub window: Window,
-    pub root: Window,
-    pub subwindow: Window,
-    pub time: Time,
-    pub x: libc::c_int,
-    pub y: libc::c_int,
-    pub x_root: libc::c_int,
-    pub y_root: libc::c_int,
-    pub state: libc::c_uint,
-    pub is_hint: libc::c_char,
-    pub same_screen: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XCrossingEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub window: Window,
-    pub root: Window,
-    pub subwindow: Window,
-    pub time: Time,
-    pub x: libc::c_int,
-    pub y: libc::c_int,
-    pub x_root: libc::c_int,
-    pub y_root: libc::c_int,
-    pub mode: libc::c_int,
-    pub detail: libc::c_int,
-    pub same_screen: libc::c_int,
-    pub focus: libc::c_int,
-    pub state: libc::c_uint,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XFocusChangeEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub window: Window,
-    pub mode: libc::c_int,
-    pub detail: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XKeymapEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub window: Window,
-    pub key_vector: [libc::c_char; 32],
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XExposeEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub window: Window,
-    pub x: libc::c_int,
-    pub y: libc::c_int,
-    pub width: libc::c_int,
-    pub height: libc::c_int,
-    pub count: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XGraphicsExposeEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub drawable: Drawable,
-    pub x: libc::c_int,
-    pub y: libc::c_int,
-    pub width: libc::c_int,
-    pub height: libc::c_int,
-    pub count: libc::c_int,
-    pub major_code: libc::c_int,
-    pub minor_code: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XNoExposeEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub drawable: Drawable,
-    pub major_code: libc::c_int,
-    pub minor_code: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XVisibilityEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub window: Window,
-    pub state: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XCreateWindowEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub parent: Window,
-    pub window: Window,
-    pub x: libc::c_int,
-    pub y: libc::c_int,
-    pub width: libc::c_int,
-    pub height: libc::c_int,
-    pub border_width: libc::c_int,
-    pub override_redirect: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XDestroyWindowEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub event: Window,
-    pub window: Window,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XUnmapEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub event: Window,
-    pub window: Window,
-    pub from_configure: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XMapEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub event: Window,
-    pub window: Window,
-    pub override_redirect: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XMapRequestEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub parent: Window,
-    pub window: Window,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XReparentEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub event: Window,
-    pub window: Window,
-    pub parent: Window,
-    pub x: libc::c_int,
-    pub y: libc::c_int,
-    pub override_redirect: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XConfigureEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub event: Window,
-    pub window: Window,
-    pub x: libc::c_int,
-    pub y: libc::c_int,
-    pub width: libc::c_int,
-    pub height: libc::c_int,
-    pub border_width: libc::c_int,
-    pub above: Window,
-    pub override_redirect: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XGravityEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub event: Window,
-    pub window: Window,
-    pub x: libc::c_int,
-    pub y: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XResizeRequestEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub window: Window,
-    pub width: libc::c_int,
-    pub height: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XConfigureRequestEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub parent: Window,
-    pub window: Window,
-    pub x: libc::c_int,
-    pub y: libc::c_int,
-    pub width: libc::c_int,
-    pub height: libc::c_int,
-    pub border_width: libc::c_int,
-    pub above: Window,
-    pub detail: libc::c_int,
-    pub value_mask: libc::c_ulong,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XCirculateEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub event: Window,
-    pub window: Window,
-    pub place: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XCirculateRequestEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub parent: Window,
-    pub window: Window,
-    pub place: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XPropertyEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub window: Window,
-    pub atom: Atom,
-    pub time: Time,
-    pub state: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XSelectionClearEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub window: Window,
-    pub selection: Atom,
-    pub time: Time,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XSelectionRequestEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub owner: Window,
-    pub requestor: Window,
-    pub selection: Atom,
-    pub target: Atom,
-    pub property: Atom,
-    pub time: Time,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XSelectionEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub requestor: Window,
-    pub selection: Atom,
-    pub target: Atom,
-    pub property: Atom,
-    pub time: Time,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XColormapEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub window: Window,
-    pub colormap: Colormap,
-    pub new: libc::c_int,
-    pub state: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XClientMessageEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub window: Window,
-    pub message_type: Atom,
-    pub format: libc::c_int,
-    pub data: C2RustUnnamed_0,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub union C2RustUnnamed_0 {
@@ -631,156 +117,7 @@ pub union C2RustUnnamed_0 {
     pub s: [libc::c_short; 10],
     pub l: [libc::c_long; 5],
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XMappingEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub window: Window,
-    pub request: libc::c_int,
-    pub first_keycode: libc::c_int,
-    pub count: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XErrorEvent {
-    pub type_0: libc::c_int,
-    pub display: *mut Display,
-    pub resourceid: XID,
-    pub serial: libc::c_ulong,
-    pub error_code: libc::c_uchar,
-    pub request_code: libc::c_uchar,
-    pub minor_code: libc::c_uchar,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XAnyEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub window: Window,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XGenericEvent {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub extension: libc::c_int,
-    pub evtype: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XGenericEventCookie {
-    pub type_0: libc::c_int,
-    pub serial: libc::c_ulong,
-    pub send_event: libc::c_int,
-    pub display: *mut Display,
-    pub extension: libc::c_int,
-    pub evtype: libc::c_int,
-    pub cookie: libc::c_uint,
-    pub data: *mut libc::c_void,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub union _XEvent {
-    pub type_0: libc::c_int,
-    pub xany: XAnyEvent,
-    pub xkey: XKeyEvent,
-    pub xbutton: XButtonEvent,
-    pub xmotion: XMotionEvent,
-    pub xcrossing: XCrossingEvent,
-    pub xfocus: XFocusChangeEvent,
-    pub xexpose: XExposeEvent,
-    pub xgraphicsexpose: XGraphicsExposeEvent,
-    pub xnoexpose: XNoExposeEvent,
-    pub xvisibility: XVisibilityEvent,
-    pub xcreatewindow: XCreateWindowEvent,
-    pub xdestroywindow: XDestroyWindowEvent,
-    pub xunmap: XUnmapEvent,
-    pub xmap: XMapEvent,
-    pub xmaprequest: XMapRequestEvent,
-    pub xreparent: XReparentEvent,
-    pub xconfigure: XConfigureEvent,
-    pub xgravity: XGravityEvent,
-    pub xresizerequest: XResizeRequestEvent,
-    pub xconfigurerequest: XConfigureRequestEvent,
-    pub xcirculate: XCirculateEvent,
-    pub xcirculaterequest: XCirculateRequestEvent,
-    pub xproperty: XPropertyEvent,
-    pub xselectionclear: XSelectionClearEvent,
-    pub xselectionrequest: XSelectionRequestEvent,
-    pub xselection: XSelectionEvent,
-    pub xcolormap: XColormapEvent,
-    pub xclient: XClientMessageEvent,
-    pub xmapping: XMappingEvent,
-    pub xerror: XErrorEvent,
-    pub xkeymap: XKeymapEvent,
-    pub xgeneric: XGenericEvent,
-    pub xcookie: XGenericEventCookie,
-    pub pad: [libc::c_long; 24],
-}
-pub type XEvent = _XEvent;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XCharStruct {
-    pub lbearing: libc::c_short,
-    pub rbearing: libc::c_short,
-    pub width: libc::c_short,
-    pub ascent: libc::c_short,
-    pub descent: libc::c_short,
-    pub attributes: libc::c_ushort,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XFontProp {
-    pub name: Atom,
-    pub card32: libc::c_ulong,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XFontStruct {
-    pub ext_data: *mut XExtData,
-    pub fid: Font,
-    pub direction: libc::c_uint,
-    pub min_char_or_byte2: libc::c_uint,
-    pub max_char_or_byte2: libc::c_uint,
-    pub min_byte1: libc::c_uint,
-    pub max_byte1: libc::c_uint,
-    pub all_chars_exist: libc::c_int,
-    pub default_char: libc::c_uint,
-    pub n_properties: libc::c_int,
-    pub properties: *mut XFontProp,
-    pub min_bounds: XCharStruct,
-    pub max_bounds: XCharStruct,
-    pub per_char: *mut XCharStruct,
-    pub ascent: libc::c_int,
-    pub descent: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XSizeHints {
-    pub flags: libc::c_long,
-    pub x: libc::c_int,
-    pub y: libc::c_int,
-    pub width: libc::c_int,
-    pub height: libc::c_int,
-    pub min_width: libc::c_int,
-    pub min_height: libc::c_int,
-    pub max_width: libc::c_int,
-    pub max_height: libc::c_int,
-    pub width_inc: libc::c_int,
-    pub height_inc: libc::c_int,
-    pub min_aspect: C2RustUnnamed_1,
-    pub max_aspect: C2RustUnnamed_1,
-    pub base_width: libc::c_int,
-    pub base_height: libc::c_int,
-    pub win_gravity: libc::c_int,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_1 {
@@ -905,7 +242,7 @@ pub unsafe extern "C" fn lclick_taskbutton(mut old_c: *mut Client,
 }
 #[no_mangle]
 pub unsafe extern "C" fn lclick_taskbar(mut x: libc::c_int) {
-    let mut ev: XEvent = _XEvent{type_0: 0,};
+    let mut ev: XEvent = XEvent{type_: 0,};
     let mut mousex: libc::c_int = 0;
     let mut mousey: libc::c_int = 0;
     let mut bounddims: Rect = Rect{x: 0, y: 0, width: 0, height: 0,};
@@ -979,16 +316,16 @@ pub unsafe extern "C" fn lclick_taskbar(mut x: libc::c_int) {
                            ((1 as libc::c_long) << 0 as libc::c_int |
                                 (1 as libc::c_long) << 1 as libc::c_int),
                        &mut ev);
-            match ev.type_0 {
+            match ev.type_ {
                 12 => {
                     exposed_c =
-                        find_client(ev.xexpose.window, 1 as libc::c_int);
+                        find_client(ev.expose.window, 1 as libc::c_int);
                     if !exposed_c.is_null() { redraw(exposed_c); }
                 }
                 6 => {
                     old_button_clicked = button_clicked;
                     button_clicked =
-                        (ev.xmotion.x as libc::c_float / button_width) as
+                        (ev.motion.x as libc::c_float / button_width) as
                             libc::c_uint;
                     if button_clicked != old_button_clicked {
                         old_c = c;
@@ -1004,9 +341,9 @@ pub unsafe extern "C" fn lclick_taskbar(mut x: libc::c_int) {
                 2 => { XPutBackEvent(dsply, &mut ev); }
                 _ => { }
             }
-            if !(ev.type_0 != 4 as libc::c_int &&
-                     ev.type_0 != 5 as libc::c_int &&
-                     ev.type_0 != 2 as libc::c_int) {
+            if !(ev.type_ != 4 as libc::c_int &&
+                     ev.type_ != 5 as libc::c_int &&
+                     ev.type_ != 2 as libc::c_int) {
                 break ;
             }
         }
@@ -1018,7 +355,7 @@ pub unsafe extern "C" fn lclick_taskbar(mut x: libc::c_int) {
 }
 #[no_mangle]
 pub unsafe extern "C" fn rclick_taskbar(mut x: libc::c_int) {
-    let mut ev: XEvent = _XEvent{type_0: 0,};
+    let mut ev: XEvent = XEvent{type_: 0,};
     let mut mousex: libc::c_int = 0;
     let mut mousey: libc::c_int = 0;
     let mut bounddims: Rect = Rect{x: 0, y: 0, width: 0, height: 0,};
@@ -1082,8 +419,8 @@ pub unsafe extern "C" fn rclick_taskbar(mut x: libc::c_int) {
                        ((1 as libc::c_long) << 0 as libc::c_int |
                             (1 as libc::c_long) << 1 as libc::c_int),
                    &mut ev);
-        match ev.type_0 {
-            6 => { current_item = update_menuitem(ev.xmotion.x) }
+        match ev.type_ {
+            6 => { current_item = update_menuitem(ev.motion.x) }
             5 => {
                 if current_item !=
                        (2147483647 as libc::c_int as
@@ -1099,8 +436,8 @@ pub unsafe extern "C" fn rclick_taskbar(mut x: libc::c_int) {
             2 => { XPutBackEvent(dsply, &mut ev); }
             _ => { }
         }
-        if !(ev.type_0 != 4 as libc::c_int && ev.type_0 != 5 as libc::c_int &&
-                 ev.type_0 != 2 as libc::c_int) {
+        if !(ev.type_ != 4 as libc::c_int && ev.type_ != 5 as libc::c_int &&
+                 ev.type_ != 2 as libc::c_int) {
             break ;
         }
     }
@@ -1111,7 +448,7 @@ pub unsafe extern "C" fn rclick_taskbar(mut x: libc::c_int) {
 }
 #[no_mangle]
 pub unsafe extern "C" fn rclick_root() {
-    let mut ev: XEvent = _XEvent{type_0: 0,};
+    let mut ev: XEvent = XEvent{type_: 0,};
     if !(XGrabPointer(dsply, root, 0 as libc::c_int,
                       ((1 as libc::c_long) << 2 as libc::c_int |
                            (1 as libc::c_long) << 3 as libc::c_int |
@@ -1131,21 +468,21 @@ pub unsafe extern "C" fn rclick_root() {
                        ((1 as libc::c_long) << 0 as libc::c_int |
                             (1 as libc::c_long) << 1 as libc::c_int),
                    &mut ev);
-        match ev.type_0 {
+        match ev.type_ {
             6 => {
-                if ev.xmotion.y <
+                if ev.motion.y <
                        (*font).ascent + (*font).descent +
                            2 as libc::c_int * 3 as libc::c_int +
                            2 as libc::c_int {
                     XUngrabPointer(dsply, 0 as libc::c_long as Time);
-                    rclick_taskbar(ev.xmotion.x);
+                    rclick_taskbar(ev.motion.x);
                     return
                 }
             }
             2 => { XPutBackEvent(dsply, &mut ev); }
             _ => { }
         }
-        if !(ev.type_0 != 5 as libc::c_int && ev.type_0 != 2 as libc::c_int) {
+        if !(ev.type_ != 5 as libc::c_int && ev.type_ != 2 as libc::c_int) {
             break ;
         }
     }
