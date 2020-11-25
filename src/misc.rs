@@ -364,8 +364,8 @@ pub unsafe extern "C" fn handle_xerror(mut dsply_0: *mut Display,
 }
 /* Ick. Argh. You didn't see this function. */
 #[no_mangle]
-pub unsafe extern "C" fn ignore_xerror(mut dsply_0: *mut Display,
-                                       mut e: *mut XErrorEvent)
+pub unsafe extern "C" fn ignore_xerror(mut _dsply_0: *mut Display,
+                                       mut _e: *mut XErrorEvent)
  -> libc::c_int {
     return 0 as libc::c_int;
 }

@@ -369,9 +369,7 @@ pub struct Rect {
 pub unsafe extern "C" fn do_event_loop() {
     let mut ev: XEvent = XEvent{type_: 0,};
     loop  {
-        unsafe {
-            XNextEvent(dsply, &mut ev);
-        }
+        XNextEvent(dsply, &mut ev);
         /* check to see if menu rebuild has been requested */
         if do_menuitems != 0 { free_menuitems(); get_menuitems(); }
         match ev.type_ {
