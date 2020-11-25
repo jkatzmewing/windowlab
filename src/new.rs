@@ -1,65 +1,15 @@
 use ::libc;
+use x11::xlib::*;
+
 extern "C" {
-    pub type _XGC;
-    pub type _XDisplay;
     pub type _XPrivate;
     pub type _XrmHashBucketRec;
-    #[no_mangle]
-    fn XCreateWindow(_: *mut Display, _: Window, _: libc::c_int,
-                     _: libc::c_int, _: libc::c_uint, _: libc::c_uint,
-                     _: libc::c_uint, _: libc::c_int, _: libc::c_uint,
-                     _: *mut Visual, _: libc::c_ulong,
-                     _: *mut XSetWindowAttributes) -> Window;
-    #[no_mangle]
-    fn XAddToSaveSet(_: *mut Display, _: Window) -> libc::c_int;
     #[no_mangle]
     fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
     #[no_mangle]
     fn get_mouse_position(_: *mut libc::c_int, _: *mut libc::c_int);
     #[no_mangle]
     fn fix_position(_: *mut Client);
-    #[no_mangle]
-    fn XFetchName(_: *mut Display, _: Window, _: *mut *mut libc::c_char)
-     -> libc::c_int;
-    #[no_mangle]
-    fn XFree(_: *mut libc::c_void) -> libc::c_int;
-    #[no_mangle]
-    fn XGetTransientForHint(_: *mut Display, _: Window, _: *mut Window)
-     -> libc::c_int;
-    #[no_mangle]
-    fn XGetWindowAttributes(_: *mut Display, _: Window,
-                            _: *mut XWindowAttributes) -> libc::c_int;
-    #[no_mangle]
-    fn XGrabServer(_: *mut Display) -> libc::c_int;
-    #[no_mangle]
-    fn XMapRaised(_: *mut Display, _: Window) -> libc::c_int;
-    #[no_mangle]
-    fn XMapWindow(_: *mut Display, _: Window) -> libc::c_int;
-    #[no_mangle]
-    fn XReparentWindow(_: *mut Display, _: Window, _: Window, _: libc::c_int,
-                       _: libc::c_int) -> libc::c_int;
-    #[no_mangle]
-    fn XResizeWindow(_: *mut Display, _: Window, _: libc::c_uint,
-                     _: libc::c_uint) -> libc::c_int;
-    #[no_mangle]
-    fn XSelectInput(_: *mut Display, _: Window, _: libc::c_long)
-     -> libc::c_int;
-    #[no_mangle]
-    fn XSetWindowBorderWidth(_: *mut Display, _: Window, _: libc::c_uint)
-     -> libc::c_int;
-    #[no_mangle]
-    fn XSync(_: *mut Display, _: libc::c_int) -> libc::c_int;
-    #[no_mangle]
-    fn XUngrabServer(_: *mut Display) -> libc::c_int;
-    #[no_mangle]
-    fn XUnmapWindow(_: *mut Display, _: Window) -> libc::c_int;
-    #[no_mangle]
-    fn XAllocSizeHints() -> *mut XSizeHints;
-    #[no_mangle]
-    fn XGetWMHints(_: *mut Display, _: Window) -> *mut XWMHints;
-    #[no_mangle]
-    fn XGetWMNormalHints(_: *mut Display, _: Window, _: *mut XSizeHints,
-                         _: *mut libc::c_long) -> libc::c_int;
     #[no_mangle]
     fn XShapeSelectInput(_: *mut Display, _: Window, _: libc::c_ulong);
     #[no_mangle]
@@ -97,134 +47,7 @@ extern "C" {
     #[no_mangle]
     fn redraw_taskbar();
 }
-pub type XID = libc::c_ulong;
-pub type Atom = libc::c_ulong;
-pub type VisualID = libc::c_ulong;
-pub type Window = XID;
-pub type Font = XID;
-pub type Pixmap = XID;
-pub type Cursor = XID;
-pub type Colormap = XID;
-pub type XPointer = *mut libc::c_char;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct _XExtData {
-    pub number: libc::c_int,
-    pub next: *mut _XExtData,
-    pub free_private: Option<unsafe extern "C" fn(_: *mut _XExtData)
-                                 -> libc::c_int>,
-    pub private_data: XPointer,
-}
-pub type XExtData = _XExtData;
-pub type GC = *mut _XGC;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Visual {
-    pub ext_data: *mut XExtData,
-    pub visualid: VisualID,
-    pub class: libc::c_int,
-    pub red_mask: libc::c_ulong,
-    pub green_mask: libc::c_ulong,
-    pub blue_mask: libc::c_ulong,
-    pub bits_per_rgb: libc::c_int,
-    pub map_entries: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Depth {
-    pub depth: libc::c_int,
-    pub nvisuals: libc::c_int,
-    pub visuals: *mut Visual,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct Screen {
-    pub ext_data: *mut XExtData,
-    pub display: *mut _XDisplay,
-    pub root: Window,
-    pub width: libc::c_int,
-    pub height: libc::c_int,
-    pub mwidth: libc::c_int,
-    pub mheight: libc::c_int,
-    pub ndepths: libc::c_int,
-    pub depths: *mut Depth,
-    pub root_depth: libc::c_int,
-    pub root_visual: *mut Visual,
-    pub default_gc: GC,
-    pub cmap: Colormap,
-    pub white_pixel: libc::c_ulong,
-    pub black_pixel: libc::c_ulong,
-    pub max_maps: libc::c_int,
-    pub min_maps: libc::c_int,
-    pub backing_store: libc::c_int,
-    pub save_unders: libc::c_int,
-    pub root_input_mask: libc::c_long,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct ScreenFormat {
-    pub ext_data: *mut XExtData,
-    pub depth: libc::c_int,
-    pub bits_per_pixel: libc::c_int,
-    pub scanline_pad: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XSetWindowAttributes {
-    pub background_pixmap: Pixmap,
-    pub background_pixel: libc::c_ulong,
-    pub border_pixmap: Pixmap,
-    pub border_pixel: libc::c_ulong,
-    pub bit_gravity: libc::c_int,
-    pub win_gravity: libc::c_int,
-    pub backing_store: libc::c_int,
-    pub backing_planes: libc::c_ulong,
-    pub backing_pixel: libc::c_ulong,
-    pub save_under: libc::c_int,
-    pub event_mask: libc::c_long,
-    pub do_not_propagate_mask: libc::c_long,
-    pub override_redirect: libc::c_int,
-    pub colormap: Colormap,
-    pub cursor: Cursor,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XWindowAttributes {
-    pub x: libc::c_int,
-    pub y: libc::c_int,
-    pub width: libc::c_int,
-    pub height: libc::c_int,
-    pub border_width: libc::c_int,
-    pub depth: libc::c_int,
-    pub visual: *mut Visual,
-    pub root: Window,
-    pub class: libc::c_int,
-    pub bit_gravity: libc::c_int,
-    pub win_gravity: libc::c_int,
-    pub backing_store: libc::c_int,
-    pub backing_planes: libc::c_ulong,
-    pub backing_pixel: libc::c_ulong,
-    pub save_under: libc::c_int,
-    pub colormap: Colormap,
-    pub map_installed: libc::c_int,
-    pub map_state: libc::c_int,
-    pub all_event_masks: libc::c_long,
-    pub your_event_mask: libc::c_long,
-    pub do_not_propagate_mask: libc::c_long,
-    pub override_redirect: libc::c_int,
-    pub screen: *mut Screen,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XColor {
-    pub pixel: libc::c_ulong,
-    pub red: libc::c_ushort,
-    pub green: libc::c_ushort,
-    pub blue: libc::c_ushort,
-    pub flags: libc::c_char,
-    pub pad: libc::c_char,
-}
-pub type Display = _XDisplay;
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed {
@@ -276,81 +99,14 @@ pub struct C2RustUnnamed {
     pub xdefaults: *mut libc::c_char,
 }
 pub type _XPrivDisplay = *mut C2RustUnnamed;
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XCharStruct {
-    pub lbearing: libc::c_short,
-    pub rbearing: libc::c_short,
-    pub width: libc::c_short,
-    pub ascent: libc::c_short,
-    pub descent: libc::c_short,
-    pub attributes: libc::c_ushort,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XFontProp {
-    pub name: Atom,
-    pub card32: libc::c_ulong,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XFontStruct {
-    pub ext_data: *mut XExtData,
-    pub fid: Font,
-    pub direction: libc::c_uint,
-    pub min_char_or_byte2: libc::c_uint,
-    pub max_char_or_byte2: libc::c_uint,
-    pub min_byte1: libc::c_uint,
-    pub max_byte1: libc::c_uint,
-    pub all_chars_exist: libc::c_int,
-    pub default_char: libc::c_uint,
-    pub n_properties: libc::c_int,
-    pub properties: *mut XFontProp,
-    pub min_bounds: XCharStruct,
-    pub max_bounds: XCharStruct,
-    pub per_char: *mut XCharStruct,
-    pub ascent: libc::c_int,
-    pub descent: libc::c_int,
-}
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XSizeHints {
-    pub flags: libc::c_long,
-    pub x: libc::c_int,
-    pub y: libc::c_int,
-    pub width: libc::c_int,
-    pub height: libc::c_int,
-    pub min_width: libc::c_int,
-    pub min_height: libc::c_int,
-    pub max_width: libc::c_int,
-    pub max_height: libc::c_int,
-    pub width_inc: libc::c_int,
-    pub height_inc: libc::c_int,
-    pub min_aspect: C2RustUnnamed_0,
-    pub max_aspect: C2RustUnnamed_0,
-    pub base_width: libc::c_int,
-    pub base_height: libc::c_int,
-    pub win_gravity: libc::c_int,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_0 {
     pub x: libc::c_int,
     pub y: libc::c_int,
 }
-#[derive(Copy, Clone)]
-#[repr(C)]
-pub struct XWMHints {
-    pub flags: libc::c_long,
-    pub input: libc::c_int,
-    pub initial_state: libc::c_int,
-    pub icon_pixmap: Pixmap,
-    pub icon_window: Window,
-    pub icon_x: libc::c_int,
-    pub icon_y: libc::c_int,
-    pub icon_mask: Pixmap,
-    pub window_group: XID,
-}
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct Client {
