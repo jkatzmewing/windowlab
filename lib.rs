@@ -13,12 +13,7 @@
 #![feature(register_tool)]
 #![register_tool(c2rust)]
 
-
-#[macro_use]
-extern crate c2rust_asm_casts;
 extern crate libc;
-
-
 
 pub mod src {
 pub mod client;

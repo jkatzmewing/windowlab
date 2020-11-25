@@ -5,7 +5,8 @@
 
 extern crate x11;
 use x11::xlib::*;
-use ::c2rust_out::*;
+use ::c2rust_out;
+
 extern "C" {
     pub type _XPrivate;
     pub type _XrmHashBucketRec;
