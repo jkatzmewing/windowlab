@@ -1,9 +1,15 @@
 #![allow(dead_code, mutable_transmutes, non_camel_case_types, non_snake_case,
-         non_upper_case_globals, unused_assignments, unused_mut)]
+non_upper_case_globals, unused_assignments, unused_mut)]
 #![register_tool(c2rust)]
 #![feature(const_raw_ptr_to_usize_cast, extern_types, main, register_tool)]
 
+extern crate getopts;
 extern crate x11;
+
+use getopts::Options;
+use std::env;
+use std::ffi::CString;
+use std::str::Matches;
 use x11::xlib::*;
 use ::c2rust_out;
 
@@ -37,22 +43,27 @@ extern "C" {
     #[no_mangle]
     fn do_event_loop();
 }
+
 pub type __uint32_t = libc::c_uint;
 pub type __uid_t = libc::c_uint;
 pub type __pid_t = libc::c_int;
 pub type __clock_t = libc::c_long;
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct __sigset_t {
     pub __val: [libc::c_ulong; 16],
 }
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub union sigval {
     pub sival_int: libc::c_int,
     pub sival_ptr: *mut libc::c_void,
 }
+
 pub type __sigval_t = sigval;
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct siginfo_t {
@@ -62,6 +73,7 @@ pub struct siginfo_t {
     pub __pad0: libc::c_int,
     pub _sifields: C2RustUnnamed,
 }
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub union C2RustUnnamed {
@@ -74,6 +86,7 @@ pub union C2RustUnnamed {
     pub _sigpoll: C2RustUnnamed_1,
     pub _sigsys: C2RustUnnamed_0,
 }
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_0 {
@@ -81,12 +94,14 @@ pub struct C2RustUnnamed_0 {
     pub _syscall: libc::c_int,
     pub _arch: libc::c_uint,
 }
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_1 {
     pub si_band: libc::c_long,
     pub si_fd: libc::c_int,
 }
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_2 {
@@ -94,18 +109,21 @@ pub struct C2RustUnnamed_2 {
     pub si_addr_lsb: libc::c_short,
     pub _bounds: C2RustUnnamed_3,
 }
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub union C2RustUnnamed_3 {
     pub _addr_bnd: C2RustUnnamed_4,
     pub _pkey: __uint32_t,
 }
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_4 {
     pub _lower: *mut libc::c_void,
     pub _upper: *mut libc::c_void,
 }
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_5 {
@@ -115,6 +133,7 @@ pub struct C2RustUnnamed_5 {
     pub si_utime: __clock_t,
     pub si_stime: __clock_t,
 }
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_6 {
@@ -122,6 +141,7 @@ pub struct C2RustUnnamed_6 {
     pub si_uid: __uid_t,
     pub si_sigval: __sigval_t,
 }
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_7 {
@@ -129,13 +149,16 @@ pub struct C2RustUnnamed_7 {
     pub si_overrun: libc::c_int,
     pub si_sigval: __sigval_t,
 }
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct C2RustUnnamed_8 {
     pub si_pid: __pid_t,
     pub si_uid: __uid_t,
 }
+
 pub type __sighandler_t = Option<unsafe extern "C" fn(_: libc::c_int) -> ()>;
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct sigaction {
@@ -144,6 +167,7 @@ pub struct sigaction {
     pub sa_flags: libc::c_int,
     pub sa_restorer: Option<unsafe extern "C" fn() -> ()>,
 }
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub union C2RustUnnamed_9 {
@@ -151,7 +175,7 @@ pub union C2RustUnnamed_9 {
     pub sa_sigaction: Option<unsafe extern "C" fn(_: libc::c_int,
                                                   _: *mut siginfo_t,
                                                   _: *mut libc::c_void)
-                                 -> ()>,
+                                                  -> ()>,
 }
 
 #[derive(Copy, Clone)]
@@ -169,7 +193,7 @@ pub struct C2RustUnnamed_10 {
     pub private5: XID,
     pub private6: libc::c_int,
     pub resource_alloc: Option<unsafe extern "C" fn(_: *mut _XDisplay)
-                                   -> XID>,
+                                                    -> XID>,
     pub byte_order: libc::c_int,
     pub bitmap_unit: libc::c_int,
     pub bitmap_pad: libc::c_int,
@@ -190,7 +214,7 @@ pub struct C2RustUnnamed_10 {
     pub max_request_size: libc::c_uint,
     pub db: *mut _XrmHashBucketRec,
     pub private15: Option<unsafe extern "C" fn(_: *mut _XDisplay)
-                              -> libc::c_int>,
+                                               -> libc::c_int>,
     pub display_name: *mut libc::c_char,
     pub default_screen: libc::c_int,
     pub nscreens: libc::c_int,
@@ -204,6 +228,7 @@ pub struct C2RustUnnamed_10 {
     pub private19: libc::c_int,
     pub xdefaults: *mut libc::c_char,
 }
+
 pub type _XPrivDisplay = *mut C2RustUnnamed_10;
 
 #[derive(Copy, Clone)]
@@ -212,6 +237,7 @@ pub struct C2RustUnnamed_11 {
     pub x: libc::c_int,
     pub y: libc::c_int,
 }
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct Client {
@@ -232,6 +258,7 @@ pub struct Client {
     pub focus_order: libc::c_uint,
     pub has_been_shaped: libc::c_int,
 }
+
 #[derive(Copy, Clone)]
 #[repr(C)]
 pub struct Rect {
@@ -288,28 +315,28 @@ pub static mut selected_gc: GC = 0 as *const _XGC as *mut _XGC;
 pub static mut empty_gc: GC = 0 as *const _XGC as *mut _XGC;
 #[no_mangle]
 pub static mut border_col: XColor =
-    XColor{pixel: 0, red: 0, green: 0, blue: 0, flags: 0, pad: 0,};
+    XColor { pixel: 0, red: 0, green: 0, blue: 0, flags: 0, pad: 0 };
 #[no_mangle]
 pub static mut text_col: XColor =
-    XColor{pixel: 0, red: 0, green: 0, blue: 0, flags: 0, pad: 0,};
+    XColor { pixel: 0, red: 0, green: 0, blue: 0, flags: 0, pad: 0 };
 #[no_mangle]
 pub static mut active_col: XColor =
-    XColor{pixel: 0, red: 0, green: 0, blue: 0, flags: 0, pad: 0,};
+    XColor { pixel: 0, red: 0, green: 0, blue: 0, flags: 0, pad: 0 };
 #[no_mangle]
 pub static mut depressed_col: XColor =
-    XColor{pixel: 0, red: 0, green: 0, blue: 0, flags: 0, pad: 0,};
+    XColor { pixel: 0, red: 0, green: 0, blue: 0, flags: 0, pad: 0 };
 #[no_mangle]
 pub static mut inactive_col: XColor =
-    XColor{pixel: 0, red: 0, green: 0, blue: 0, flags: 0, pad: 0,};
+    XColor { pixel: 0, red: 0, green: 0, blue: 0, flags: 0, pad: 0 };
 #[no_mangle]
 pub static mut menu_col: XColor =
-    XColor{pixel: 0, red: 0, green: 0, blue: 0, flags: 0, pad: 0,};
+    XColor { pixel: 0, red: 0, green: 0, blue: 0, flags: 0, pad: 0 };
 #[no_mangle]
 pub static mut selected_col: XColor =
-    XColor{pixel: 0, red: 0, green: 0, blue: 0, flags: 0, pad: 0,};
+    XColor { pixel: 0, red: 0, green: 0, blue: 0, flags: 0, pad: 0 };
 #[no_mangle]
 pub static mut empty_col: XColor =
-    XColor{pixel: 0, red: 0, green: 0, blue: 0, flags: 0, pad: 0,};
+    XColor { pixel: 0, red: 0, green: 0, blue: 0, flags: 0, pad: 0 };
 #[no_mangle]
 pub static mut resize_curs: Cursor = 0;
 #[no_mangle]
@@ -342,7 +369,7 @@ pub static mut showing_taskbar: libc::c_uint =
 #[no_mangle]
 pub static mut focus_count: libc::c_uint = 0 as libc::c_int as libc::c_uint;
 #[no_mangle]
-pub static mut fs_prevdims: Rect = Rect{x: 0, y: 0, width: 0, height: 0,};
+pub static mut fs_prevdims: Rect = Rect { x: 0, y: 0, width: 0, height: 0 };
 #[no_mangle]
 pub static mut opt_font: *mut libc::c_char =
     b"-b&h-lucida-medium-r-*-*-10-*-*-*-*-*-*-*\x00" as *const u8 as
@@ -377,75 +404,62 @@ pub static mut shape: libc::c_int = 0;
 pub static mut shape_event: libc::c_int = 0;
 #[no_mangle]
 pub static mut numlockmask: libc::c_uint = 0 as libc::c_int as libc::c_uint;
-unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char)
- -> libc::c_int {
-    let mut i: libc::c_int = 0;
+
+unsafe fn main_0(args: &Vec<String>)
+                 -> libc::c_int {
     let mut act: sigaction =
-        sigaction{__sigaction_handler: C2RustUnnamed_9{sa_handler: None,},
-                  sa_mask: __sigset_t{__val: [0; 16],},
-                  sa_flags: 0,
-                  sa_restorer: None,};
-    i = 1 as libc::c_int;
-    while i < argc {
-        if strcmp(*argv.offset(i as isize),
-                  b"-font\x00" as *const u8 as *const libc::c_char) ==
-               0 as libc::c_int && (i + 1 as libc::c_int) < argc {
-            i += 1;
-            opt_font = *argv.offset(i as isize)
-        } else if strcmp(*argv.offset(i as isize),
-                         b"-border\x00" as *const u8 as *const libc::c_char)
-                      == 0 as libc::c_int && (i + 1 as libc::c_int) < argc {
-            i += 1;
-            opt_border = *argv.offset(i as isize)
-        } else if strcmp(*argv.offset(i as isize),
-                         b"-text\x00" as *const u8 as *const libc::c_char) ==
-                      0 as libc::c_int && (i + 1 as libc::c_int) < argc {
-            i += 1;
-            opt_text = *argv.offset(i as isize)
-        } else if strcmp(*argv.offset(i as isize),
-                         b"-active\x00" as *const u8 as *const libc::c_char)
-                      == 0 as libc::c_int && (i + 1 as libc::c_int) < argc {
-            i += 1;
-            opt_active = *argv.offset(i as isize)
-        } else if strcmp(*argv.offset(i as isize),
-                         b"-inactive\x00" as *const u8 as *const libc::c_char)
-                      == 0 as libc::c_int && (i + 1 as libc::c_int) < argc {
-            i += 1;
-            opt_inactive = *argv.offset(i as isize)
-        } else if strcmp(*argv.offset(i as isize),
-                         b"-menu\x00" as *const u8 as *const libc::c_char) ==
-                      0 as libc::c_int && (i + 1 as libc::c_int) < argc {
-            i += 1;
-            opt_menu = *argv.offset(i as isize)
-        } else if strcmp(*argv.offset(i as isize),
-                         b"-selected\x00" as *const u8 as *const libc::c_char)
-                      == 0 as libc::c_int && (i + 1 as libc::c_int) < argc {
-            i += 1;
-            opt_selected = *argv.offset(i as isize)
-        } else if strcmp(*argv.offset(i as isize),
-                         b"-empty\x00" as *const u8 as *const libc::c_char) ==
-                      0 as libc::c_int && (i + 1 as libc::c_int) < argc {
-            i += 1;
-            opt_empty = *argv.offset(i as isize)
-        } else if strcmp(*argv.offset(i as isize),
-                         b"-display\x00" as *const u8 as *const libc::c_char)
-                      == 0 as libc::c_int && (i + 1 as libc::c_int) < argc {
-            i += 1;
-            opt_display = *argv.offset(i as isize)
-        } else {
-            if strcmp(*argv.offset(i as isize),
-                      b"-about\x00" as *const u8 as *const libc::c_char) ==
-                   0 as libc::c_int {
-                printf(b"WindowLab 1.40 (2010-04-04), Copyright (c) 2001-2009 Nick Gravgaard\nWindowLab comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; view the LICENCE file for details.\n\x00"
-                           as *const u8 as *const libc::c_char);
-                exit(0 as libc::c_int);
-            }
-            // shouldn't get here; must be a bad option
-            err(b"usage:\n  windowlab [options]\n\noptions are:\n  -font <font>\n  -border|-text|-active|-inactive|-menu|-selected|-empty <color>\n  -about\n  -display <display>\x00"
-                    as *const u8 as *const libc::c_char);
-            return 2 as libc::c_int
+        sigaction {
+            __sigaction_handler: C2RustUnnamed_9 { sa_handler: None },
+            sa_mask: __sigset_t { __val: [0; 16] },
+            sa_flags: 0,
+            sa_restorer: None,
+        };
+    let mut opts = Options::new();
+    opts.optflag("h", "help", "this help message");
+    opts.optflag("", "about", "program description");
+    // TODO: implement Xft fonts
+    opts.optopt("f", "font", "X11 font to use", "FONT");
+    opts.optopt("b", "border", "border color", "COLOR");
+    opts.optopt("t", "text", "text color", "COLOR");
+    opts.optopt("a", "active", "active color", "COLOR");
+    opts.optopt("i", "inactive", "inactive color", "COLOR");
+    opts.optopt("m", "menu", "menu color", "COLOR");
+    opts.optopt("s", "selected", "selected color", "COLOR");
+    opts.optopt("e", "empty", "empty color", "COLOR");
+    opts.optopt("d", "display", "X display to use", "DISPLAY");
+
+    let matches = match opts.parse(&args[1..]) {
+        Ok(m) => { m }
+        Err(f) => { panic!(f.to_string()) }
+    };
+    if matches.opt_present("f") {
+        opt_font = CString::new(matches.opt_str("f").unwrap()).unwrap().into_raw();
+    } else if matches.opt_present("b"){
+        opt_border = CString::new(matches.opt_str("b").unwrap()).unwrap().into_raw();
+    } else if matches.opt_present("t") {
+        opt_text = CString::new(matches.opt_str("t").unwrap()).unwrap().into_raw();
+    } else if matches.opt_present("a") {
+        opt_active = CString::new(matches.opt_str("a").unwrap()).unwrap().into_raw();
+    } else if matches.opt_present("i") {
+        opt_inactive = CString::new(matches.opt_str("i").unwrap()).unwrap().into_raw();
+    } else if matches.opt_present("m") {
+        opt_menu = CString::new(matches.opt_str("m").unwrap()).unwrap().into_raw();
+    } else if matches.opt_present("s") {
+        opt_selected = CString::new(matches.opt_str("s").unwrap()).unwrap().into_raw();
+    } else if matches.opt_present("e") {
+        opt_empty = CString::new(matches.opt_str("e").unwrap()).unwrap().into_raw();
+    } else if matches.opt_present("d") {
+        opt_display = CString::new(matches.opt_str("d").unwrap()).unwrap().into_raw();
+    } else {
+        if matches.opt_present("about") {
+            printf(b"WindowLab 1.40 (2010-04-04), Copyright (c) 2001-2009 Nick Gravgaard\nWindowLab comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; view the LICENCE file for details.\n\x00"
+                as *const u8 as *const libc::c_char);
+            exit(0 as libc::c_int);
         }
-        i += 1
+        // shouldn't get here; must be a bad option
+        err(b"usage:\n  windowlab [options]\n\noptions are:\n  --font|-f <font>\n  --border|-b| <color>\n  --text|-t| <color>\n  --active|-a <color>\n  --inactive|-i <color>\n  --menu|-m <color>\n  --selected|-s <color>\n  --empty|-e <color>\n  --about\n  --display|-d <display>\x00"
+            as *const u8 as *const libc::c_char);
+        return 2 as libc::c_int;
     }
     act.__sigaction_handler.sa_handler =
         Some(sig_handler as unsafe extern "C" fn(_: libc::c_int) -> ());
@@ -462,6 +476,7 @@ unsafe fn main_0(mut argc: libc::c_int, mut argv: *mut *mut libc::c_char)
     return 1 as libc::c_int;
     // just another brick in the -Wall
 }
+
 unsafe extern "C" fn scan_wins() {
     let mut nwins: libc::c_uint = 0;
     let mut i: libc::c_uint = 0;
@@ -469,29 +484,31 @@ unsafe extern "C" fn scan_wins() {
     let mut dummyw2: Window = 0;
     let mut wins: *mut Window = 0 as *mut Window;
     let mut attr: XWindowAttributes =
-        XWindowAttributes{x: 0,
-                          y: 0,
-                          width: 0,
-                          height: 0,
-                          border_width: 0,
-                          depth: 0,
-                          visual: 0 as *mut Visual,
-                          root: 0,
-                          class: 0,
-                          bit_gravity: 0,
-                          win_gravity: 0,
-                          backing_store: 0,
-                          backing_planes: 0,
-                          backing_pixel: 0,
-                          save_under: 0,
-                          colormap: 0,
-                          map_installed: 0,
-                          map_state: 0,
-                          all_event_masks: 0,
-                          your_event_mask: 0,
-                          do_not_propagate_mask: 0,
-                          override_redirect: 0,
-                          screen: 0 as *mut Screen,};
+        XWindowAttributes {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
+            border_width: 0,
+            depth: 0,
+            visual: 0 as *mut Visual,
+            root: 0,
+            class: 0,
+            bit_gravity: 0,
+            win_gravity: 0,
+            backing_store: 0,
+            backing_planes: 0,
+            backing_pixel: 0,
+            save_under: 0,
+            colormap: 0,
+            map_installed: 0,
+            map_state: 0,
+            all_event_masks: 0,
+            your_event_mask: 0,
+            do_not_propagate_mask: 0,
+            override_redirect: 0,
+            screen: 0 as *mut Screen,
+        };
     XQueryTree(dsply, root, &mut dummyw1, &mut dummyw2, &mut wins,
                &mut nwins);
     i = 0 as libc::c_int as libc::c_uint;
@@ -504,49 +521,54 @@ unsafe extern "C" fn scan_wins() {
     }
     XFree(wins as *mut libc::c_void);
 }
+
 unsafe extern "C" fn setup_display() {
     let mut dummyc: XColor =
-        XColor{pixel: 0, red: 0, green: 0, blue: 0, flags: 0, pad: 0,};
+        XColor { pixel: 0, red: 0, green: 0, blue: 0, flags: 0, pad: 0 };
     let mut gv: XGCValues =
-        XGCValues{function: 0,
-                  plane_mask: 0,
-                  foreground: 0,
-                  background: 0,
-                  line_width: 0,
-                  line_style: 0,
-                  cap_style: 0,
-                  join_style: 0,
-                  fill_style: 0,
-                  fill_rule: 0,
-                  arc_mode: 0,
-                  tile: 0,
-                  stipple: 0,
-                  ts_x_origin: 0,
-                  ts_y_origin: 0,
-                  font: 0,
-                  subwindow_mode: 0,
-                  graphics_exposures: 0,
-                  clip_x_origin: 0,
-                  clip_y_origin: 0,
-                  clip_mask: 0,
-                  dash_offset: 0,
-                  dashes: 0,};
+        XGCValues {
+            function: 0,
+            plane_mask: 0,
+            foreground: 0,
+            background: 0,
+            line_width: 0,
+            line_style: 0,
+            cap_style: 0,
+            join_style: 0,
+            fill_style: 0,
+            fill_rule: 0,
+            arc_mode: 0,
+            tile: 0,
+            stipple: 0,
+            ts_x_origin: 0,
+            ts_y_origin: 0,
+            font: 0,
+            subwindow_mode: 0,
+            graphics_exposures: 0,
+            clip_x_origin: 0,
+            clip_y_origin: 0,
+            clip_mask: 0,
+            dash_offset: 0,
+            dashes: 0,
+        };
     let mut sattr: XSetWindowAttributes =
-        XSetWindowAttributes{background_pixmap: 0,
-                             background_pixel: 0,
-                             border_pixmap: 0,
-                             border_pixel: 0,
-                             bit_gravity: 0,
-                             win_gravity: 0,
-                             backing_store: 0,
-                             backing_planes: 0,
-                             backing_pixel: 0,
-                             save_under: 0,
-                             event_mask: 0,
-                             do_not_propagate_mask: 0,
-                             override_redirect: 0,
-                             colormap: 0,
-                             cursor: 0,};
+        XSetWindowAttributes {
+            background_pixmap: 0,
+            background_pixel: 0,
+            border_pixmap: 0,
+            border_pixel: 0,
+            bit_gravity: 0,
+            win_gravity: 0,
+            backing_store: 0,
+            backing_planes: 0,
+            backing_pixel: 0,
+            save_under: 0,
+            event_mask: 0,
+            do_not_propagate_mask: 0,
+            override_redirect: 0,
+            colormap: 0,
+            cursor: 0,
+        };
     let mut modmap: *mut XModifierKeymap = 0 as *mut XModifierKeymap;
     let mut i: libc::c_int = 0;
     let mut j: libc::c_int = 0;
@@ -554,13 +576,13 @@ unsafe extern "C" fn setup_display() {
     dsply = XOpenDisplay(opt_display);
     if dsply.is_null() {
         err(b"can\'t open display! check your DISPLAY variable.\x00" as
-                *const u8 as *const libc::c_char);
+            *const u8 as *const libc::c_char);
         exit(1 as libc::c_int);
     }
     XSetErrorHandler(Some(handle_xerror as
-                              unsafe extern "C" fn(_: *mut Display,
-                                                   _: *mut XErrorEvent)
-                                  -> libc::c_int));
+        unsafe extern "C" fn(_: *mut Display,
+                             _: *mut XErrorEvent)
+                             -> libc::c_int));
     screen = (*(dsply as _XPrivDisplay)).default_screen;
     root =
         (*(*(dsply as _XPrivDisplay)).screens.offset(screen as isize)).root;
@@ -586,38 +608,38 @@ unsafe extern "C" fn setup_display() {
                         *const libc::c_char, 0 as libc::c_int);
     XAllocNamedColor(dsply,
                      (*(*(dsply as
-                              _XPrivDisplay)).screens.offset(screen as
-                                                                 isize)).cmap,
+                         _XPrivDisplay)).screens.offset(screen as
+                         isize)).cmap,
                      opt_border, &mut border_col, &mut dummyc);
     XAllocNamedColor(dsply,
                      (*(*(dsply as
-                              _XPrivDisplay)).screens.offset(screen as
-                                                                 isize)).cmap,
+                         _XPrivDisplay)).screens.offset(screen as
+                         isize)).cmap,
                      opt_text, &mut text_col, &mut dummyc);
     XAllocNamedColor(dsply,
                      (*(*(dsply as
-                              _XPrivDisplay)).screens.offset(screen as
-                                                                 isize)).cmap,
+                         _XPrivDisplay)).screens.offset(screen as
+                         isize)).cmap,
                      opt_active, &mut active_col, &mut dummyc);
     XAllocNamedColor(dsply,
                      (*(*(dsply as
-                              _XPrivDisplay)).screens.offset(screen as
-                                                                 isize)).cmap,
+                         _XPrivDisplay)).screens.offset(screen as
+                         isize)).cmap,
                      opt_inactive, &mut inactive_col, &mut dummyc);
     XAllocNamedColor(dsply,
                      (*(*(dsply as
-                              _XPrivDisplay)).screens.offset(screen as
-                                                                 isize)).cmap,
+                         _XPrivDisplay)).screens.offset(screen as
+                         isize)).cmap,
                      opt_menu, &mut menu_col, &mut dummyc);
     XAllocNamedColor(dsply,
                      (*(*(dsply as
-                              _XPrivDisplay)).screens.offset(screen as
-                                                                 isize)).cmap,
+                         _XPrivDisplay)).screens.offset(screen as
+                         isize)).cmap,
                      opt_selected, &mut selected_col, &mut dummyc);
     XAllocNamedColor(dsply,
                      (*(*(dsply as
-                              _XPrivDisplay)).screens.offset(screen as
-                                                                 isize)).cmap,
+                         _XPrivDisplay)).screens.offset(screen as
+                         isize)).cmap,
                      opt_empty, &mut empty_col, &mut dummyc);
     depressed_col.pixel = active_col.pixel;
     depressed_col.red =
@@ -631,26 +653,26 @@ unsafe extern "C" fn setup_display() {
             libc::c_ushort;
     depressed_col.red =
         if depressed_col.red as libc::c_int <=
-               32767 as libc::c_int * 2 as libc::c_int + 1 as libc::c_int -
-                   0x2000 as libc::c_int {
+            32767 as libc::c_int * 2 as libc::c_int + 1 as libc::c_int -
+                0x2000 as libc::c_int {
             depressed_col.red as libc::c_int
         } else { 0 as libc::c_int } as libc::c_ushort;
     depressed_col.green =
         if depressed_col.green as libc::c_int <=
-               32767 as libc::c_int * 2 as libc::c_int + 1 as libc::c_int -
-                   0x2000 as libc::c_int {
+            32767 as libc::c_int * 2 as libc::c_int + 1 as libc::c_int -
+                0x2000 as libc::c_int {
             depressed_col.green as libc::c_int
         } else { 0 as libc::c_int } as libc::c_ushort;
     depressed_col.blue =
         if depressed_col.blue as libc::c_int <=
-               32767 as libc::c_int * 2 as libc::c_int + 1 as libc::c_int -
-                   0x2000 as libc::c_int {
+            32767 as libc::c_int * 2 as libc::c_int + 1 as libc::c_int -
+                0x2000 as libc::c_int {
             depressed_col.blue as libc::c_int
         } else { 0 as libc::c_int } as libc::c_ushort;
     XAllocColor(dsply,
                 (*(*(dsply as
-                         _XPrivDisplay)).screens.offset(screen as
-                                                            isize)).cmap,
+                    _XPrivDisplay)).screens.offset(screen as
+                    isize)).cmap,
                 &mut depressed_col);
     font = XLoadQueryFont(dsply, opt_font);
     if font.is_null() {
@@ -667,9 +689,9 @@ unsafe extern "C" fn setup_display() {
         j = 0 as libc::c_int;
         while j < (*modmap).max_keypermod {
             if *(*modmap).modifiermap.offset((i * (*modmap).max_keypermod + j)
-                                                 as isize) as libc::c_int ==
-                   XKeysymToKeycode(dsply, 0xff7f as libc::c_int as KeySym) as
-                       libc::c_int {
+                as isize) as libc::c_int ==
+                XKeysymToKeycode(dsply, 0xff7f as libc::c_int as KeySym) as
+                    libc::c_int {
                 numlockmask = ((1 as libc::c_int) << i) as libc::c_uint
             }
             j += 1
@@ -683,8 +705,8 @@ unsafe extern "C" fn setup_display() {
     border_gc =
         XCreateGC(dsply, root,
                   ((1 as libc::c_long) << 0 as libc::c_int |
-                       (1 as libc::c_long) << 2 as libc::c_int |
-                       (1 as libc::c_long) << 4 as libc::c_int) as
+                      (1 as libc::c_long) << 2 as libc::c_int |
+                      (1 as libc::c_long) << 4 as libc::c_int) as
                       libc::c_ulong, &mut gv);
     gv.foreground = text_col.pixel;
     gv.line_width = 1 as libc::c_int;
@@ -692,51 +714,51 @@ unsafe extern "C" fn setup_display() {
     text_gc =
         XCreateGC(dsply, root,
                   ((1 as libc::c_long) << 0 as libc::c_int |
-                       (1 as libc::c_long) << 2 as libc::c_int |
-                       (1 as libc::c_long) << 14 as libc::c_int) as
+                      (1 as libc::c_long) << 2 as libc::c_int |
+                      (1 as libc::c_long) << 14 as libc::c_int) as
                       libc::c_ulong, &mut gv);
     gv.foreground = active_col.pixel;
     active_gc =
         XCreateGC(dsply, root,
                   ((1 as libc::c_long) << 0 as libc::c_int |
-                       (1 as libc::c_long) << 2 as libc::c_int) as
+                      (1 as libc::c_long) << 2 as libc::c_int) as
                       libc::c_ulong, &mut gv);
     gv.foreground = depressed_col.pixel;
     depressed_gc =
         XCreateGC(dsply, root,
                   ((1 as libc::c_long) << 0 as libc::c_int |
-                       (1 as libc::c_long) << 2 as libc::c_int) as
+                      (1 as libc::c_long) << 2 as libc::c_int) as
                       libc::c_ulong, &mut gv);
     gv.foreground = inactive_col.pixel;
     inactive_gc =
         XCreateGC(dsply, root,
                   ((1 as libc::c_long) << 0 as libc::c_int |
-                       (1 as libc::c_long) << 2 as libc::c_int) as
+                      (1 as libc::c_long) << 2 as libc::c_int) as
                       libc::c_ulong, &mut gv);
     gv.foreground = menu_col.pixel;
     menu_gc =
         XCreateGC(dsply, root,
                   ((1 as libc::c_long) << 0 as libc::c_int |
-                       (1 as libc::c_long) << 2 as libc::c_int) as
+                      (1 as libc::c_long) << 2 as libc::c_int) as
                       libc::c_ulong, &mut gv);
     gv.foreground = selected_col.pixel;
     selected_gc =
         XCreateGC(dsply, root,
                   ((1 as libc::c_long) << 0 as libc::c_int |
-                       (1 as libc::c_long) << 2 as libc::c_int) as
+                      (1 as libc::c_long) << 2 as libc::c_int) as
                       libc::c_ulong, &mut gv);
     gv.foreground = empty_col.pixel;
     empty_gc =
         XCreateGC(dsply, root,
                   ((1 as libc::c_long) << 0 as libc::c_int |
-                       (1 as libc::c_long) << 2 as libc::c_int) as
+                      (1 as libc::c_long) << 2 as libc::c_int) as
                       libc::c_ulong, &mut gv);
     sattr.event_mask =
         (1 as libc::c_long) << 20 as libc::c_int |
             (1 as libc::c_long) << 19 as libc::c_int |
             (1 as libc::c_long) << 23 as libc::c_int |
             ((1 as libc::c_long) << 2 as libc::c_int |
-                 (1 as libc::c_long) << 3 as libc::c_int);
+                (1 as libc::c_long) << 3 as libc::c_int);
     XChangeWindowAttributes(dsply, root,
                             ((1 as libc::c_long) << 11 as libc::c_int) as
                                 libc::c_ulong, &mut sattr);
@@ -749,7 +771,7 @@ unsafe extern "C" fn setup_display() {
              XKeysymToKeycode(dsply, 0xff09 as libc::c_int as KeySym) as
                  libc::c_int,
              ((1 as libc::c_int) << 1 as libc::c_int |
-                  (1 as libc::c_int) << 3 as libc::c_int) as libc::c_uint,
+                 (1 as libc::c_int) << 3 as libc::c_int) as libc::c_uint,
              root, 1 as libc::c_int, 1 as libc::c_int, 1 as libc::c_int);
     if numlockmask != 0 {
         XGrabKey(dsply,
@@ -776,7 +798,7 @@ unsafe extern "C" fn setup_display() {
              XKeysymToKeycode(dsply, 0x71 as libc::c_int as KeySym) as
                  libc::c_int,
              ((1 as libc::c_int) << 1 as libc::c_int |
-                  (1 as libc::c_int) << 3 as libc::c_int) as libc::c_uint,
+                 (1 as libc::c_int) << 3 as libc::c_int) as libc::c_uint,
              root, 1 as libc::c_int, 1 as libc::c_int, 1 as libc::c_int);
     if numlockmask != 0 {
         XGrabKey(dsply,
@@ -803,7 +825,7 @@ unsafe extern "C" fn setup_display() {
              XKeysymToKeycode(dsply, 0xffc8 as libc::c_int as KeySym) as
                  libc::c_int,
              ((1 as libc::c_int) << 1 as libc::c_int |
-                  (1 as libc::c_int) << 3 as libc::c_int) as libc::c_uint,
+                 (1 as libc::c_int) << 3 as libc::c_int) as libc::c_uint,
              root, 1 as libc::c_int, 1 as libc::c_int, 1 as libc::c_int);
     if numlockmask != 0 {
         XGrabKey(dsply,
@@ -830,7 +852,7 @@ unsafe extern "C" fn setup_display() {
              XKeysymToKeycode(dsply, 0xffc9 as libc::c_int as KeySym) as
                  libc::c_int,
              ((1 as libc::c_int) << 1 as libc::c_int |
-                  (1 as libc::c_int) << 3 as libc::c_int) as libc::c_uint,
+                 (1 as libc::c_int) << 3 as libc::c_int) as libc::c_uint,
              root, 1 as libc::c_int, 1 as libc::c_int, 1 as libc::c_int);
     if numlockmask != 0 {
         XGrabKey(dsply,
@@ -849,16 +871,18 @@ unsafe extern "C" fn setup_display() {
                  root, 1 as libc::c_int, 1 as libc::c_int, 1 as libc::c_int);
     };
 }
+
 #[main]
 pub fn main() {
+    /*
     let mut args: Vec<*mut libc::c_char> = Vec::new();
     for arg in ::std::env::args() {
         args.push(::std::ffi::CString::new(arg).expect("Failed to convert argument into CString.").into_raw());
     };
     args.push(::std::ptr::null_mut());
+     */
+    let args: Vec<String> = env::args().collect();
     unsafe {
-        ::std::process::exit(main_0((args.len() - 1) as libc::c_int,
-                                    args.as_mut_ptr() as
-                                        *mut *mut libc::c_char) as i32)
+        ::std::process::exit(main_0(&args))
     }
 }
