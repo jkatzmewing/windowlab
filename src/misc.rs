@@ -2,11 +2,6 @@ use ::libc;
 use x11::xlib::*;
 
 extern "C" {
-    pub type _IO_wide_data;
-    pub type _IO_codecvt;
-    pub type _IO_marker;
-    pub type _XPrivate;
-    pub type _XrmHashBucketRec;
     #[no_mangle]
     fn strrchr(_: *const libc::c_char, _: libc::c_int) -> *mut libc::c_char;
     #[no_mangle]
@@ -90,7 +85,6 @@ pub struct _IO_FILE {
     pub _IO_save_base: *mut libc::c_char,
     pub _IO_backup_base: *mut libc::c_char,
     pub _IO_save_end: *mut libc::c_char,
-    pub _markers: *mut _IO_marker,
     pub _chain: *mut _IO_FILE,
     pub _fileno: libc::c_int,
     pub _flags2: libc::c_int,
@@ -100,8 +94,6 @@ pub struct _IO_FILE {
     pub _shortbuf: [libc::c_char; 1],
     pub _lock: *mut libc::c_void,
     pub _offset: __off64_t,
-    pub _codecvt: *mut _IO_codecvt,
-    pub _wide_data: *mut _IO_wide_data,
     pub _freeres_list: *mut _IO_FILE,
     pub _freeres_buf: *mut libc::c_void,
     pub __pad5: size_t,
@@ -187,7 +179,6 @@ pub type Display = _XDisplay;
 #[repr(C)]
 pub struct C2RustUnnamed {
     pub ext_data: *mut XExtData,
-    pub private1: *mut _XPrivate,
     pub fd: libc::c_int,
     pub private2: libc::c_int,
     pub proto_major_version: libc::c_int,
@@ -207,8 +198,6 @@ pub struct C2RustUnnamed {
     pub pixmap_format: *mut ScreenFormat,
     pub private8: libc::c_int,
     pub release: libc::c_int,
-    pub private9: *mut _XPrivate,
-    pub private10: *mut _XPrivate,
     pub qlen: libc::c_int,
     pub last_request_read: libc::c_ulong,
     pub request: libc::c_ulong,
@@ -217,7 +206,6 @@ pub struct C2RustUnnamed {
     pub private13: XPointer,
     pub private14: XPointer,
     pub max_request_size: libc::c_uint,
-    pub db: *mut _XrmHashBucketRec,
     pub private15: Option<unsafe extern "C" fn(_: *mut _XDisplay)
                               -> libc::c_int>,
     pub display_name: *mut libc::c_char,
@@ -277,14 +265,7 @@ pub struct Rect {
     pub width: libc::c_int,
     pub height: libc::c_int,
 }
-#[no_mangle]
-pub unsafe extern "C" fn err(mut fmt: *const libc::c_char, mut args: ...) {
-    let mut argp: ::std::ffi::VaListImpl;
-    fprintf(stderr, b"windowlab: \x00" as *const u8 as *const libc::c_char);
-    argp = args.clone();
-    vfprintf(stderr, fmt, argp.as_va_list());
-    fprintf(stderr, b"\n\x00" as *const u8 as *const libc::c_char);
-}
+
 #[no_mangle]
 pub unsafe extern "C" fn fork_exec(mut cmd: *mut libc::c_char) {
     let mut envshell: *mut libc::c_char = 0 as *mut libc::c_char;
@@ -310,11 +291,10 @@ pub unsafe extern "C" fn fork_exec(mut cmd: *mut libc::c_char) {
             execlp(envshell, envshellname,
                    b"-c\x00" as *const u8 as *const libc::c_char, cmd,
                    0 as *mut libc::c_void);
-            err(b"exec failed, cleaning up child\x00" as *const u8 as
-                    *const libc::c_char);
+            eprintln!("exec failed, cleaning up child");
             exit(1 as libc::c_int);
         }
-        -1 => { err(b"can\'t fork\x00" as *const u8 as *const libc::c_char); }
+        -1 => { eprintln!("can\'t fork"); }
         _ => { }
     };
 }
@@ -347,8 +327,7 @@ pub unsafe extern "C" fn handle_xerror(mut dsply_0: *mut Display,
     let mut c: *mut Client = find_client((*e).resourceid, 0 as libc::c_int);
     if (*e).error_code as libc::c_int == 10 as libc::c_int &&
            (*e).resourceid == root {
-        err(b"root window unavailable (maybe another wm is running?)\x00" as
-                *const u8 as *const libc::c_char);
+        eprintln!("root window unavailable (maybe another wm is running?)");
         exit(1 as libc::c_int);
     } else {
         let mut msg: [libc::c_char; 255] = [0; 255];
@@ -356,8 +335,7 @@ pub unsafe extern "C" fn handle_xerror(mut dsply_0: *mut Display,
                       msg.as_mut_ptr(),
                       ::std::mem::size_of::<[libc::c_char; 255]>() as
                           libc::c_ulong as libc::c_int);
-        err(b"X error (%#lx): %s\x00" as *const u8 as *const libc::c_char,
-            (*e).resourceid, msg.as_mut_ptr());
+        eprintln!("X error ({}): {}", (*e).resourceid, msg.as_mut_ptr());
     }
     if !c.is_null() { remove_client(c, 0 as libc::c_int); }
     return 0 as libc::c_int;

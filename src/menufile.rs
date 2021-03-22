@@ -46,8 +46,6 @@ extern "C" {
     #[no_mangle]
     static mut font: *mut XFontStruct;
     #[no_mangle]
-    fn err(_: *const libc::c_char, _: ...);
-    #[no_mangle]
     fn __errno_location() -> *mut libc::c_int;
 }
 pub type __off_t = libc::c_long;
@@ -166,8 +164,7 @@ pub unsafe extern "C" fn get_menuitems() {
                                                     libc::c_ulong)) as
             *mut MenuItem;
     if menuitems.is_null() {
-        err(b"Unable to allocate menu items array.\x00" as *const u8 as
-                *const libc::c_char);
+        eprintln!("Unable to allocate menu items array.");
         return
     }
     memset(menuitems as *mut libc::c_void, 0 as libc::c_int,
@@ -190,8 +187,7 @@ pub unsafe extern "C" fn get_menuitems() {
                          *const libc::c_char, menurcpath.as_mut_ptr(),
                      (4096 as libc::c_int - 1 as libc::c_int) as size_t);
         if len == -(1 as libc::c_int) as libc::c_long {
-            err(b"readlink() /proc/self/exe failed: %s\n\x00" as *const u8 as
-                    *const libc::c_char, strerror(*__errno_location()));
+            eprintln!("readlink() /proc/self/exe failed: {}", strerror(*__errno_location()));
             menurcpath[0 as libc::c_int as usize] =
                 '.' as i32 as libc::c_char;
             menurcpath[1 as libc::c_int as usize] =
@@ -283,10 +279,8 @@ pub unsafe extern "C" fn get_menuitems() {
         fclose(menufile);
     } else {
         // one menu item - xterm
-        err(b"can\'t find ~/.windowlab/windowlab.menurc, %s or %s\n\x00" as
-                *const u8 as *const libc::c_char, menurcpath.as_mut_ptr(),
-            b"/usr/local/etc/X11/windowlab/windowlab.menurc\x00" as *const u8
-                as *const libc::c_char);
+        eprintln!("can\'t find ~/.windowlab/windowlab.menurc, {} or {}", menurcpath.as_mut_ptr(),
+            "/usr/local/etc/X11/windowlab/windowlab.menurc");
         let ref mut fresh2 =
             (*menuitems.offset(0 as libc::c_int as isize)).command;
         *fresh2 =

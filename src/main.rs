@@ -37,8 +37,6 @@ extern "C" {
     #[no_mangle]
     fn sig_handler(_: libc::c_int);
     #[no_mangle]
-    fn err(_: *const libc::c_char, _: ...);
-    #[no_mangle]
     fn make_new_client(_: Window);
     #[no_mangle]
     fn do_event_loop();
@@ -452,13 +450,11 @@ unsafe fn main_0(args: &Vec<String>)
         opt_display = CString::new(matches.opt_str("d").unwrap()).unwrap().into_raw();
     } else {
         if matches.opt_present("about") {
-            printf(b"WindowLab 1.40 (2010-04-04), Copyright (c) 2001-2009 Nick Gravgaard\nWindowLab comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; view the LICENCE file for details.\n\x00"
-                as *const u8 as *const libc::c_char);
+            println!("WindowLab 1.40 (2010-04-04), Copyright (c) 2001-2009 Nick Gravgaard\nWindowLab comes with ABSOLUTELY NO WARRANTY.\nThis is free software, and you are welcome to redistribute it\nunder certain conditions; view the LICENCE file for details.");
             exit(0 as libc::c_int);
         }
         // shouldn't get here; must be a bad option
-        err(b"usage:\n  windowlab [options]\n\noptions are:\n  --font|-f <font>\n  --border|-b| <color>\n  --text|-t| <color>\n  --active|-a <color>\n  --inactive|-i <color>\n  --menu|-m <color>\n  --selected|-s <color>\n  --empty|-e <color>\n  --about\n  --display|-d <display>\x00"
-            as *const u8 as *const libc::c_char);
+        eprintln!("usage:\n  windowlab [options]\n\noptions are:\n  --font|-f <font>\n  --border|-b| <color>\n  --text|-t| <color>\n  --active|-a <color>\n  --inactive|-i <color>\n  --menu|-m <color>\n  --selected|-s <color>\n  --empty|-e <color>\n  --about\n  --display|-d <display>");
         return 2 as libc::c_int;
     }
     act.__sigaction_handler.sa_handler =
@@ -575,8 +571,7 @@ unsafe extern "C" fn setup_display() {
     let mut dummy: libc::c_int = 0;
     dsply = XOpenDisplay(opt_display);
     if dsply.is_null() {
-        err(b"can\'t open display! check your DISPLAY variable.\x00" as
-            *const u8 as *const libc::c_char);
+        eprintln!("can\'t open display! check your DISPLAY variable.");
         exit(1 as libc::c_int);
     }
     XSetErrorHandler(Some(handle_xerror as
@@ -676,8 +671,7 @@ unsafe extern "C" fn setup_display() {
                 &mut depressed_col);
     font = XLoadQueryFont(dsply, opt_font);
     if font.is_null() {
-        err(b"XLoadQueryFont(): font \'%s\' not found\x00" as *const u8 as
-                *const libc::c_char, opt_font);
+        eprintln!("XLoadQueryFont(): font \'{}\' not found", opt_font);
         exit(1 as libc::c_int);
     }
     shape = XShapeQueryExtension(dsply, &mut shape_event, &mut dummy);

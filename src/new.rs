@@ -2,8 +2,6 @@ use ::libc;
 use x11::xlib::*;
 
 extern "C" {
-    pub type _XPrivate;
-    pub type _XrmHashBucketRec;
     #[no_mangle]
     fn malloc(_: libc::c_ulong) -> *mut libc::c_void;
     #[no_mangle]
@@ -52,7 +50,6 @@ extern "C" {
 #[repr(C)]
 pub struct C2RustUnnamed {
     pub ext_data: *mut XExtData,
-    pub private1: *mut _XPrivate,
     pub fd: libc::c_int,
     pub private2: libc::c_int,
     pub proto_major_version: libc::c_int,
@@ -72,8 +69,6 @@ pub struct C2RustUnnamed {
     pub pixmap_format: *mut ScreenFormat,
     pub private8: libc::c_int,
     pub release: libc::c_int,
-    pub private9: *mut _XPrivate,
-    pub private10: *mut _XPrivate,
     pub qlen: libc::c_int,
     pub last_request_read: libc::c_ulong,
     pub request: libc::c_ulong,
@@ -82,7 +77,6 @@ pub struct C2RustUnnamed {
     pub private13: XPointer,
     pub private14: XPointer,
     pub max_request_size: libc::c_uint,
-    pub db: *mut _XrmHashBucketRec,
     pub private15: Option<unsafe extern "C" fn(_: *mut _XDisplay)
                               -> libc::c_int>,
     pub display_name: *mut libc::c_char,
