@@ -2,9 +2,6 @@ use ::libc;
 use x11::xlib::*;
 
 extern "C" {
-    pub type _IO_wide_data;
-    pub type _IO_codecvt;
-    pub type _IO_marker;
     #[no_mangle]
     fn fclose(__stream: *mut FILE) -> libc::c_int;
     #[no_mangle]
@@ -72,7 +69,6 @@ pub struct _IO_FILE {
     pub _IO_save_base: *mut libc::c_char,
     pub _IO_backup_base: *mut libc::c_char,
     pub _IO_save_end: *mut libc::c_char,
-    pub _markers: *mut _IO_marker,
     pub _chain: *mut _IO_FILE,
     pub _fileno: libc::c_int,
     pub _flags2: libc::c_int,
@@ -82,8 +78,6 @@ pub struct _IO_FILE {
     pub _shortbuf: [libc::c_char; 1],
     pub _lock: *mut libc::c_void,
     pub _offset: __off64_t,
-    pub _codecvt: *mut _IO_codecvt,
-    pub _wide_data: *mut _IO_wide_data,
     pub _freeres_list: *mut _IO_FILE,
     pub _freeres_buf: *mut libc::c_void,
     pub __pad5: size_t,

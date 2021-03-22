@@ -5,12 +5,6 @@
 #![allow(non_upper_case_globals)]
 #![allow(unused_assignments)]
 #![allow(unused_mut)]
-#![feature(asm)]
-#![feature(c_variadic)]
-#![feature(const_raw_ptr_to_usize_cast)]
-#![feature(extern_types)]
-#![feature(main)]
-#![feature(register_tool)]
 #![register_tool(c2rust)]
 
 extern crate libc;
